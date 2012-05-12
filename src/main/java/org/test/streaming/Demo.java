@@ -96,7 +96,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	}
 	
 	  public static void main(String[] args) throws Exception{
-	        Server server = new Server(Integer.valueOf(System.getenv("PORT")));
+//	        Server server = new Server(Integer.valueOf(System.getenv("PORT")));
+	        Server server = new Server(5000);
 	        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	        context.setContextPath("/");
 	        server.setHandler(context);
