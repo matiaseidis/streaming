@@ -1,19 +1,18 @@
 package org.test.streaming;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
 public class Demo extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
@@ -39,7 +38,53 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		int st=0;
 		if ( start!=null ) st=Integer.parseInt( start );
 
-		downloadFile( response, id, name, st );
+//		downloadFile( response, id, name, st );
+		
+		getFile(response);
+	}
+
+	private void getFile(HttpServletResponse response) {
+		BufferedInputStream bis = null;
+		try
+		{
+
+			// Send data
+			String urlStr = "http://186.23.108.31/streaming/test/blablabla.mp4";
+
+			URL url = new URL(urlStr);
+			URLConnection conn = url.openConnection ();
+
+			// Get the response
+			bis = new BufferedInputStream(conn.getInputStream());
+			
+			OutputStream os = response.getOutputStream();
+			int read = 0;
+			byte[] bytes = new byte[1024];
+			
+			byte[] headerMP4 = new byte[] {
+					(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x14, (byte) 0x66, (byte) 0x74, (byte) 0x79, (byte) 0x70,
+					(byte) 0x71, (byte) 0x74, (byte) 0x20, (byte) 0x20
+			};
+			
+//			byte[] headerFLV= new byte[] {
+//					(byte) 0x46, (byte) 0x4C, (byte) 0x56,
+//					(byte) 0x01,
+//					(byte) 0x05,
+//					(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x09,
+//					(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x09
+//			};
+
+			while((read = bis.read(bytes)) != -1) {
+				os.write(bytes, 0, read);
+			}
+
+			os.flush();
+			os.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+
+		try {
+			if (bis!=null) bis.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -94,15 +139,4 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		} catch (Exception ex) { ex.printStackTrace(); }
 
 	}
-	
-	  public static void main(String[] args) throws Exception{
-//	        Server server = new Server(Integer.valueOf(System.getenv("PORT")));
-	        Server server = new Server(5000);
-	        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-	        context.setContextPath("/");
-	        server.setHandler(context);
-	        context.addServlet(new ServletHolder(new Demo()),"/*");
-	        server.start();
-	        server.join();   
-	    }
 }

@@ -16,7 +16,7 @@ clip: {
     autoPlay:false,
     autoBuffering:true,
     scaling:'fit',
-url: 'test/blablabla.mp4',
+url: 'http://186.23.108.31:8080/streaming-client/blablabla.mp4test/blablabla.mp4',
 provider: 'lighthttpd',
 },
 plugins: {
