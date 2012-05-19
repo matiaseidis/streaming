@@ -16,7 +16,7 @@ clip: {
     autoPlay:false,
     autoBuffering:true,
     scaling:'fit',
-    url: 'testest2Meta.flv',
+    url: 'sandonga.flv',
 	provider: 'lighthttpd'
 },
 plugins: {

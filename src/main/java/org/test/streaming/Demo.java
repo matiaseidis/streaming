@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class Demo extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
+	private static final double MegabitsPerSec = 0.2;
+	private static final double KbitsPerSec = MegabitsPerSec * 1000;
 	/**
 	 * 
 	 */
@@ -96,8 +98,10 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			response.setBufferSize(1024 * 1024);
 			// response.setBufferSize(0);
 			response.setContentType(contentTypeMP4);
-			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fdesc.getName(), "UTF-8"));
-			response.addHeader("Content-Length", "" + fdesc.length());
+			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(pathname, "UTF-8"));
+			List<FileInputStream> parts = parts(fdesc);
+
+			response.addHeader("Content-Length", "" + length(fdesc));
 			response.flushBuffer();
 
 			OutputStream os = response.getOutputStream();
@@ -131,19 +135,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 	}
 
-	private static InputStream creatasdsaeStream(File fdesc) throws FileNotFoundException {
-		return (InputStream) new FileInputStream(fdesc);
-	}
-
 	private static InputStream createStream(File fdesc) throws FileNotFoundException {
-		final List<InputStream> parts = new LinkedList<InputStream>();
-		String name = fdesc.getAbsolutePath();
-		File partFile = newPartFile(name, 0);
-		for (int part = 1; partFile.exists(); part++) {
-			parts.add(new FileInputStream(partFile));
-			partFile = newPartFile(name, part);
-			System.err.println(partFile + "" + partFile.exists());
-		}
+		final List<FileInputStream> parts = parts(fdesc);
 
 		System.err.println(parts.size());
 		return new InputStream() {
@@ -169,10 +162,14 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 				return read;
 			}
 
+			double BytesPerSec = KbitsPerSec * 1000 / 8;
+			double BytesPerMili = BytesPerSec / 1000;
+			double transferCostFactor = 2;
+
 			private int readByte() throws IOException {
 				int read = current.read();
 				count++;
-				if (count == 100) {
+				if (count >= BytesPerMili * transferCostFactor) {
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
@@ -184,5 +181,28 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 				return read;
 			}
 		};
+	}
+
+	private static int length(File fdesc) throws FileNotFoundException {
+		int length = 0;
+		String name = fdesc.getAbsolutePath();
+		File partFile = newPartFile(name, 0);
+		for (int part = 1; partFile.exists(); part++) {
+			length += partFile.length();
+			partFile = newPartFile(name, part);
+
+		}
+		return length;
+	}
+
+	private static List<FileInputStream> parts(File fdesc) throws FileNotFoundException {
+		final List<FileInputStream> parts = new LinkedList<FileInputStream>();
+		String name = fdesc.getAbsolutePath();
+		File partFile = newPartFile(name, 0);
+		for (int part = 1; partFile.exists(); part++) {
+			parts.add(new FileInputStream(partFile));
+			partFile = newPartFile(name, part);
+		}
+		return parts;
 	}
 }
