@@ -10,7 +10,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>s</servlet-name>
-		<url-pattern>*.mp4</url-pattern>
+		<url-pattern>*.flv</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

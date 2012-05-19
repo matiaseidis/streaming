@@ -16,15 +16,16 @@ clip: {
     autoPlay:false,
     autoBuffering:true,
     scaling:'fit',
-url: 'http://186.23.108.31:8080/streaming-client/blablabla.mp4test/blablabla.mp4',
-provider: 'lighthttpd',
+    url: 'testest2Meta.flv',
+	provider: 'lighthttpd'
 },
 plugins: {
 	lighthttpd: {
 		url: 'flowplayer/flowplayer.pseudostreaming/flowplayer.pseudostreaming-3.2.9.swf'
 	},
     controls: {
-        url: 'flowplayer/flowplayer.controls-3.2.10.swf'
+        url: 'flowplayer/flowplayer.controls-3.2.10.swf',
+        autoHide: 'never'
     }
 
 }
