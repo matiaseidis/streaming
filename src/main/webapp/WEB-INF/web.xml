@@ -10,7 +10,22 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>s</servlet-name>
-		<url-pattern>*.flv</url-pattern>
+		<url-pattern>/stream/*</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<servlet>
+		<servlet-name>u</servlet-name>
+		<servlet-class>org.test.streaming.Upload</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>u</servlet-name>
+		<url-pattern>/upload/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.srt</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

@@ -15,10 +15,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
 public class Demo extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
-	private static final double MegabitsPerSec = 0.2;
+	private static final double MegabitsPerSec = 9;
 	private static final double KbitsPerSec = MegabitsPerSec * 1000;
+	
+	private static String video = "Luther.S02E01.720p.HDTV.x264.2.mp4";
+	private static int bufferSize = 256 * 256;
 	/**
 	 * 
 	 */
@@ -29,10 +36,19 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	// private String contentType = "video/x-flv";
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		
+		String file = (String)request.getSession(true).getAttribute("file");
+		
+		
 		String url = request.getRequestURL().toString();
 		String[] u = url.split("/");
 
-		String name = u[u.length - 1];
+		String name = null;
+		if(file != null){
+			name = file;
+		} else {
+			name = u[u.length - 1];
+		}
 		String id = u[u.length - 2];
 		String start = request.getParameter("start");
 
@@ -52,33 +68,33 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		doGet(req, resp);
 	}
 
-	public static void main(String[] args) throws Exception {
-		String name = "./a.mp4";
-		InputStream is = new FileInputStream(name);
-		int part = 0;
-		OutputStream ous = new FileOutputStream(newPartFile(name, 0));
-
-		int b = 0;
-		int count = 0;
-		try {
-			while ((b = is.read()) != -1) {
-				count++;
-				ous.write(b);
-				if (count == 1024 * 1024) {
-					ous.close();
-					part++;
-					File file = newPartFile(name, part);
-					ous = new FileOutputStream(file);
-					count = 0;
-				}
-			}
-			ous.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+//	public void createParts() throws Exception {
+//		String name = "./a.mp4";
+//		InputStream is = new FileInputStream(name);
+//		int part = 0;
+//		OutputStream ous = new FileOutputStream(newPartFile(name, 0));
+//
+//		int b = 0;
+//		int count = 0;
+//		try {
+//			while ((b = is.read()) != -1) {
+//				count++;
+//				ous.write(b);
+//				if (count == 2048 * 1024) {
+//					ous.close();
+//					part++;
+//					File file = newPartFile(name, part);
+//					ous = new FileOutputStream(file);
+//					count = 0;
+//				}
+//			}
+//			ous.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	private static File newPartFile(String name, int part) {
 		File file = new File(name + ".part." + part);
@@ -92,16 +108,20 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			// File fdesc = new
 			// File("E:\\Downloads\\ffmpeg-20120503-git-c1fe2db-win32-static\\ffmpeg-20120503-git-c1fe2db-win32-static\\bin\\test2.flv");
 			// String pathname = "E:\\Lucas\\Dropbox\\lucas\\testest2Meta.flv";
-			String pathname = "./a.mp4";
+//			String pathname = "./a.mp4";
+
+			String pathname = Upload.targetDir+name;
 			File fdesc = new File(pathname);
 			// getContentType( fdesc.getName() )
-			response.setBufferSize(1024 * 1024);
+			response.setBufferSize(bufferSize);
 			// response.setBufferSize(0);
 			response.setContentType(contentTypeMP4);
-			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(pathname, "UTF-8"));
-			List<FileInputStream> parts = parts(fdesc);
+			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(name, "UTF-8"));
+//			List<FileInputStream> parts = parts(fdesc);
 
+//			response.addHeader("Content-Transfer-Encoding", "binary");
 			response.addHeader("Content-Length", "" + length(fdesc));
+
 			response.flushBuffer();
 
 			OutputStream os = response.getOutputStream();
@@ -148,12 +168,18 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			public int read() throws IOException {
 				if (current == null) {
 					current = parts.get(0);
+					if (current == null) {
+						System.out.println("no esta la sandonga");
+						
+					}
 				}
 				int read = readByte();
 				if (read == -1) {
+					System.out.println("listo "+ parts.indexOf(current));
 					int currentIndex = parts.indexOf(current);
 					if (parts.size() == currentIndex + 1) {
 						read = -1;
+						System.out.println("listo");
 					} else {
 						current = parts.get(currentIndex + 1);
 						read = readByte();
@@ -205,4 +231,15 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		}
 		return parts;
 	}
+	
+//	 public static void main(String[] args) throws Exception{
+//	        Server server = new Server(Integer.valueOf(System.getenv("PORT")));
+//	        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//	        context.setContextPath("/");
+//	        server.setHandler(context);
+//	        context.addServlet(new ServletHolder(new Demo()),"/demo");
+//	        context.addServlet(new ServletHolder(new Upload()),"/upload");
+//	        server.start();
+//	        server.join();   
+//	    }
 }
