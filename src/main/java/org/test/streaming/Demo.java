@@ -47,7 +47,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		if(file != null){
 			name = file;
 		} else {
-			name = u[u.length - 1];
+			name = video; //u[u.length - 1];
 		}
 		String id = u[u.length - 2];
 		String start = request.getParameter("start");
