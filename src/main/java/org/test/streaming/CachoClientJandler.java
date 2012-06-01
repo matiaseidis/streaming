@@ -1,4 +1,5 @@
 package org.test.streaming;
+
 import java.io.OutputStream;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -18,7 +19,8 @@ public class CachoClientJandler extends SimpleChannelHandler {
 	}
 
 	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e)
+			throws Exception {
 		ChannelBuffer buffer = ChannelBuffers.buffer(1);
 		buffer.writeByte(this.cachoNumber);
 		e.getChannel().write(buffer);
@@ -26,10 +28,14 @@ public class CachoClientJandler extends SimpleChannelHandler {
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		System.out.println("CachoClientJandler.messageReceived()");
+	public synchronized void messageReceived(ChannelHandlerContext ctx,
+			MessageEvent e) throws Exception {
 		ChannelBuffer cacho = (ChannelBuffer) e.getMessage();
-		cacho.getBytes(cacho.arrayOffset(), out, cacho.readableBytes());
+		System.out.println("CachoClientJandler.messageReceived()"
+				+ cacho.readableBytes());
+		// cacho.getBytes(cacho.arrayOffset(), out, cacho.readableBytes());
+		cacho.readBytes(out, cacho.readableBytes());
+		System.out.println("out written " + cacho.readableBytes());
 	}
-
+	
 }

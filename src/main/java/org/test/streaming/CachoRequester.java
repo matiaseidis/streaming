@@ -1,4 +1,5 @@
 package org.test.streaming;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -18,7 +19,10 @@ public class CachoRequester {
 
 	public static void main(String[] args) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		new CachoRequester("localhost", 10002).requestCacho((byte) 1, baos);
+		CachoRequester cachoRequester = new CachoRequester("localhost", 10002);
+		for (byte i = 0; i < 6; i++) {
+			cachoRequester.requestCacho(i, baos);
+		}
 		System.out.println(baos);
 	}
 
@@ -29,21 +33,27 @@ public class CachoRequester {
 
 	public void requestCacho(final byte cachoNumber, final OutputStream out) {
 		// Configure the client.
-		ClientBootstrap bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+		ClientBootstrap bootstrap = new ClientBootstrap(
+				new NioClientSocketChannelFactory(
+						Executors.newCachedThreadPool(),
+						Executors.newCachedThreadPool()));
 
 		// Set up the pipeline factory.
+		final ChannelPipeline pipeline = Channels
+				.pipeline(new CachoClientJandler(cachoNumber, out));
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new CachoClientJandler(cachoNumber, out));
+				return pipeline;
 			}
 		});
 
 		// Start the connection attempt.
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host,
+				port));
 
 		// Wait until the connection is closed or the connection attempt fails.
 		future.getChannel().getCloseFuture().awaitUninterruptibly();
-
+		System.out.println("CachoRequester.requestCacho()");
 		// Shut down thread pools to exit.
 		bootstrap.releaseExternalResources();
 	}
