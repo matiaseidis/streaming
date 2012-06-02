@@ -135,18 +135,13 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 				os.write(headerMP4);
 				System.out.println("Demo.downloadFile()");
 			}
-
-			CachoRequester cachoRequester = new CachoRequester("localhost", 10002);
-			int totalSize = 5570947;
-			int totalRequested = 0;
-			int requestSize = 1024 * 512;
-			int amountOfRequests = 0;
-			while (totalSize - totalRequested >= requestSize) {
-				cachoRequester.requestCacho("a.mp4", totalRequested, requestSize, os);
-				totalRequested += requestSize;
-				amountOfRequests++;
+			List<CachoRetrieval> requests = new DummyMovieRetrievalPlan().getRequests();
+			for (CachoRetrieval cachoRetrieval : requests) {
+				CachoRequester cachoRequester = new CachoRequester(cachoRetrieval.getHost(), cachoRetrieval.getPort());
+				CachoRequest request = cachoRetrieval.getRequest();
+				cachoRequester.requestCacho(request.getFileName(), request.getFirstByteIndex(), request.getLength(), os);
 			}
-			cachoRequester.requestCacho("a.mp4", totalRequested, totalSize - totalRequested, os);
+
 			os.flush();
 			os.close();
 		} catch (Exception ex) {

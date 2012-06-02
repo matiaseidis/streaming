@@ -3,6 +3,7 @@ package org.test.streaming;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -20,19 +21,12 @@ public class CachoRequester {
 
 	public static void main(String[] args) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		CachoRequester cachoRequester = new CachoRequester("localhost", 10002);
-		int totalSize = 5570947;
-		int totalRequested = 0;
-		int requestSize = 1024 * 512;
-		int amountOfRequests = 0;
-		System.err.println((totalSize / requestSize) + 1);
-		while (totalSize - totalRequested >= requestSize) {
-			cachoRequester.requestCacho("a.mp4", totalRequested, requestSize, baos);
-			totalRequested += requestSize;
-			amountOfRequests++;
+		List<CachoRetrieval> requests = new DummyMovieRetrievalPlan().getRequests();
+		for (CachoRetrieval cachoRetrieval : requests) {
+			CachoRequester cachoRequester = new CachoRequester(cachoRetrieval.getHost(), cachoRetrieval.getPort());
+			CachoRequest request = cachoRetrieval.getRequest();
+			cachoRequester.requestCacho(request.getFileName(), request.getFirstByteIndex(), request.getLength(), baos);
 		}
-		System.out.println(amountOfRequests);
-		cachoRequester.requestCacho("a.mp4", totalRequested, totalRequested - totalRequested, baos);
 		System.out.println(baos);
 	}
 
