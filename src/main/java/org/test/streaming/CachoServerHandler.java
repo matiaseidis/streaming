@@ -1,15 +1,11 @@
 package org.test.streaming;
 
-import static org.jboss.netty.buffer.ChannelBuffers.dynamicBuffer;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -17,40 +13,44 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 
 public class CachoServerHandler extends SimpleChannelHandler {
 
+	private static final String LIBRARY_DIR_PATH = "C:\\cachos\\";
+	private MovieFileLocator movieFileLocator = new CompositeMovieFileLocator(new CompleteMovieFileLocator(LIBRARY_DIR_PATH), new CachoMovieFileLocator(LIBRARY_DIR_PATH));
+
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception {
-		ChannelBuffer buf = dynamicBuffer();
-		buf.writeBytes((ChannelBuffer) e.getMessage());
-		if (buf.readableBytes() == 1) {
-			this.sendCacho(buf.readByte(), e.getChannel());
+	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		CachoRequest request = (CachoRequest) e.getMessage();
+		System.out.println("Cacho requested  " + request);
+		File mayBeMovieFile = this.getMovieFileLocator().locate(request);
+		if (mayBeMovieFile == null) {
+			// TODO devolver error
+			System.err.println("This node cannot serve the request " + request);
+			return;
 		}
+		RandomAccessFile raf = new RandomAccessFile(mayBeMovieFile, "r");
+		raf.seek(request.getFirstByteIndex());
+		int read = -1;
+		ChannelBuffer outBuffer = ChannelBuffers.buffer(request.getLength());
+		long readBytesCOunt = 0;
+		try {
+			while ((read = raf.read()) != -1 && readBytesCOunt < request.getLength()) {
+				// TODO mandar el archivo de a rafagas, no esperar a leerlo
+				// todo, para no ocupar mucha memoria
+				outBuffer.writeByte(read);
+				readBytesCOunt++;
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("Sending " + outBuffer.readableBytes() + " bytes");
+		e.getChannel().write(outBuffer).addListener(ChannelFutureListener.CLOSE);
+		System.out.println("Cacho written.");
 	}
 
-	private void sendCacho(byte partNumber, Channel channel) {
-		System.out.println("Cacho requested  " + partNumber);
-		// File file = new
-		// File("E:\\Lucas\\workspaces\\sts-2.5.1\\streamin\\a.mp4.part." +
-		// partNumber);
-		File file = new File("./a.mp4.part." + partNumber);
-		InputStream cachoInputStream = null;
-		try {
-			cachoInputStream = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		int read = -1;
-		ChannelBuffer outBuffer = dynamicBuffer();
-		try {
-			while ((read = cachoInputStream.read()) != -1) {
-				outBuffer.writeByte(read);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Sending " + outBuffer.readableBytes());
-		channel.write(outBuffer).addListener(ChannelFutureListener.CLOSE);
-		System.out.println("Cacho written.");
+	public MovieFileLocator getMovieFileLocator() {
+		return movieFileLocator;
+	}
+
+	public void setMovieFileLocator(MovieFileLocator movieFileLocator) {
+		this.movieFileLocator = movieFileLocator;
 	}
 }

@@ -1,4 +1,5 @@
 package org.test.streaming;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
@@ -8,6 +9,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 
 public class Dimon extends SimpleChannelUpstreamHandler {
 
@@ -24,7 +26,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 		// Set up the pipeline factory.
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new CachoServerHandler());
+				return Channels.pipeline(new ObjectDecoder(), new CachoServerHandler());
 			}
 		});
 

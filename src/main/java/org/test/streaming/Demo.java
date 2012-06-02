@@ -19,8 +19,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-public class Demo extends javax.servlet.http.HttpServlet implements
-		javax.servlet.Servlet {
+public class Demo extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
 	private static final double MegabitsPerSec = 9;
 	private static final double KbitsPerSec = MegabitsPerSec * 1000;
@@ -36,8 +35,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 
 	// private String contentType = "video/x-flv";
 
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		String file = (String) request.getSession(true).getAttribute("file");
 
@@ -65,8 +63,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 		}
 	}
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
@@ -103,8 +100,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 		return file;
 	}
 
-	static public void downloadFile(HttpServletResponse response, String id,
-			String name, int start) throws Exception {
+	static public void downloadFile(HttpServletResponse response, String id, String name, int start) throws Exception {
 		InputStream is = null;
 
 		try {
@@ -119,27 +115,20 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 			response.setBufferSize(bufferSize);
 			// response.setBufferSize(0);
 			response.setContentType(contentTypeMP4);
-			response.addHeader("Content-disposition", "attachment;filename="
-					+ URLEncoder.encode(name, "UTF-8"));
+			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(name, "UTF-8"));
 			// List<FileInputStream> parts = parts(fdesc);
 
 			// response.addHeader("Content-Transfer-Encoding", "binary");
-			//			 response.addHeader("Content-Length", "" + length(fdesc));
+			// response.addHeader("Content-Length", "" + length(fdesc));
 
 			response.flushBuffer();
 
 			OutputStream os = response.getOutputStream();
 			is = createStream(fdesc);
 			int read = 0;
-			byte[] headerFLV = new byte[] { (byte) 0x46, (byte) 0x4C,
-					(byte) 0x56, (byte) 0x01, (byte) 0x05, (byte) 0x00,
-					(byte) 0x00, (byte) 0x00, (byte) 0x09, (byte) 0x00,
-					(byte) 0x00, (byte) 0x00, (byte) 0x09 };
+			byte[] headerFLV = new byte[] { (byte) 0x46, (byte) 0x4C, (byte) 0x56, (byte) 0x01, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x09, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x09 };
 
-			byte[] headerMP4 = { (byte) 0x00, (byte) 0x00, (byte) 0x00,
-					(byte) 0x14, (byte) 0x66, (byte) 0x74, (byte) 0x79,
-					(byte) 0x70, (byte) 0x69, (byte) 0x73, (byte) 0x6F,
-					(byte) 0x6D };
+			byte[] headerMP4 = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x14, (byte) 0x66, (byte) 0x74, (byte) 0x79, (byte) 0x70, (byte) 0x69, (byte) 0x73, (byte) 0x6F, (byte) 0x6D };
 
 			if (start > 0) {
 				is.skip((long) start);
@@ -147,11 +136,17 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 				System.out.println("Demo.downloadFile()");
 			}
 
-			CachoRequester cachoRequester = new CachoRequester("localhost",
-					10002);
-			for (byte i = 0; i < 6; i++) {
-				cachoRequester.requestCacho(i, os);
+			CachoRequester cachoRequester = new CachoRequester("localhost", 10002);
+			int totalSize = 5570947;
+			int totalRequested = 0;
+			int requestSize = 1024 * 512;
+			int amountOfRequests = 0;
+			while (totalSize - totalRequested >= requestSize) {
+				cachoRequester.requestCacho("a.mp4", totalRequested, requestSize, os);
+				totalRequested += requestSize;
+				amountOfRequests++;
 			}
+			cachoRequester.requestCacho("a.mp4", totalRequested, totalSize - totalRequested, os);
 			os.flush();
 			os.close();
 		} catch (Exception ex) {
@@ -167,8 +162,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 
 	}
 
-	private static InputStream createStream(File fdesc)
-			throws FileNotFoundException {
+	private static InputStream createStream(File fdesc) throws FileNotFoundException {
 		final List<FileInputStream> parts = parts(fdesc);
 
 		System.err.println(parts.size());
@@ -234,8 +228,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements
 		return length;
 	}
 
-	private static List<FileInputStream> parts(File fdesc)
-			throws FileNotFoundException {
+	private static List<FileInputStream> parts(File fdesc) throws FileNotFoundException {
 		final List<FileInputStream> parts = new LinkedList<FileInputStream>();
 		String name = fdesc.getAbsolutePath();
 		File partFile = newPartFile(name, 0);

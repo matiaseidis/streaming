@@ -11,6 +11,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class CachoRequester {
 
@@ -20,9 +21,18 @@ public class CachoRequester {
 	public static void main(String[] args) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		CachoRequester cachoRequester = new CachoRequester("localhost", 10002);
-		for (byte i = 0; i < 6; i++) {
-			cachoRequester.requestCacho(i, baos);
+		int totalSize = 5570947;
+		int totalRequested = 0;
+		int requestSize = 1024 * 512;
+		int amountOfRequests = 0;
+		System.err.println((totalSize / requestSize) + 1);
+		while (totalSize - totalRequested >= requestSize) {
+			cachoRequester.requestCacho("a.mp4", totalRequested, requestSize, baos);
+			totalRequested += requestSize;
+			amountOfRequests++;
 		}
+		System.out.println(amountOfRequests);
+		cachoRequester.requestCacho("a.mp4", totalRequested, totalRequested - totalRequested, baos);
 		System.out.println(baos);
 	}
 
@@ -31,16 +41,14 @@ public class CachoRequester {
 		this.port = port;
 	}
 
-	public void requestCacho(final byte cachoNumber, final OutputStream out) {
+	public void requestCacho(String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes, final OutputStream out) {
+		CachoRequest cachoRequest = new CachoRequest(null, movieFileName, zeroBasedFirstBytePosition, amountOfBytes);
+
 		// Configure the client.
-		ClientBootstrap bootstrap = new ClientBootstrap(
-				new NioClientSocketChannelFactory(
-						Executors.newCachedThreadPool(),
-						Executors.newCachedThreadPool()));
+		ClientBootstrap bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
 
 		// Set up the pipeline factory.
-		final ChannelPipeline pipeline = Channels
-				.pipeline(new CachoClientJandler(cachoNumber, out));
+		final ChannelPipeline pipeline = Channels.pipeline(new ObjectEncoder(), new CachoClientJandler(cachoRequest, out));
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			public ChannelPipeline getPipeline() throws Exception {
 				return pipeline;
@@ -48,12 +56,9 @@ public class CachoRequester {
 		});
 
 		// Start the connection attempt.
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host,
-				port));
-
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
 		// Wait until the connection is closed or the connection attempt fails.
 		future.getChannel().getCloseFuture().awaitUninterruptibly();
-		System.out.println("CachoRequester.requestCacho()");
 		// Shut down thread pools to exit.
 		bootstrap.releaseExternalResources();
 	}
