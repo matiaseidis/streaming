@@ -1,6 +1,5 @@
 package org.test.streaming;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,9 +13,9 @@ public class CompositeMovieFileLocator implements MovieFileLocator {
 	}
 
 	@Override
-	public File locate(CachoRequest request) {
+	public MovieCachoFile locate(CachoRequest request) {
 		for (MovieFileLocator movieFileLocator : this.getLocators()) {
-			File maybeMovieFile = movieFileLocator.locate(request);
+			MovieCachoFile maybeMovieFile = movieFileLocator.locate(request);
 			if (maybeMovieFile != null) {
 				return maybeMovieFile;
 			}

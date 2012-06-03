@@ -1,5 +1,6 @@
 package org.test.streaming;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -44,6 +45,10 @@ public class MovieCacho implements Serializable {
 
 	public int getLastByteIndex() {
 		return this.getFirstByteIndex() + this.getLength() - 1;
+	}
+
+	public MovieCacho subCacho(MovieCacho cacho) {
+		return new MovieCacho(cacho.getFirstByteIndex() - this.getFirstByteIndex(), cacho.getLength());
 	}
 
 }

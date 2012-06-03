@@ -13,10 +13,10 @@ public class CompleteMovieFileLocator extends LibraryBasedMovieFileLocator {
 	}
 
 	@Override
-	public File locate(CachoRequest request) {
+	public MovieCachoFile locate(CachoRequest request) {
 		File movieFile = new File(this.getLibraryPath(), request.getFileName());
 		if (movieFile.exists()) {
-			return movieFile;
+			return new MovieCachoFile(request.getCacho(), movieFile);
 		}
 		return null;
 	}

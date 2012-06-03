@@ -10,15 +10,16 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		List<CachoRetrieval> requests = new LinkedList<CachoRetrieval>();
 		int totalSize = 5570947;
 		int totalRequested = 0;
-		int requestSize = 1024 * 512;
+		int requestSize = 1024 * 1024;
 		int amountOfRequests = 0;
 		System.err.println((totalSize / requestSize) + 1);
+		String movieFileName = "a.mp4";
 		while (totalSize - totalRequested >= requestSize) {
-			requests.add(new CachoRetrieval("localhost", 10002, new CachoRequest(null, "a.mp4", totalRequested, requestSize)));
+			requests.add(new CachoRetrieval("localhost", 10002, new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;
 			amountOfRequests++;
 		}
-		requests.add(new CachoRetrieval("localhost", 10002, new CachoRequest(null, "a.mp4", totalRequested, totalSize - totalRequested)));
+		requests.add(new CachoRetrieval("localhost", 10002, new CachoRequest(null, movieFileName, totalRequested, totalSize - totalRequested)));
 		return requests;
 	}
 }

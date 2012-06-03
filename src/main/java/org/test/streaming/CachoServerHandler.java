@@ -1,6 +1,5 @@
 package org.test.streaming;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -20,14 +19,15 @@ public class CachoServerHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		CachoRequest request = (CachoRequest) e.getMessage();
 		System.out.println("Cacho requested  " + request);
-		File mayBeMovieFile = this.getMovieFileLocator().locate(request);
+		MovieCachoFile mayBeMovieFile = this.getMovieFileLocator().locate(request);
 		if (mayBeMovieFile == null) {
 			// TODO devolver error
 			System.err.println("This node cannot serve the request " + request);
 			return;
 		}
-		RandomAccessFile raf = new RandomAccessFile(mayBeMovieFile, "r");
-		raf.seek(request.getFirstByteIndex());
+		System.out.println("Cacho file " + mayBeMovieFile);
+		RandomAccessFile raf = new RandomAccessFile(mayBeMovieFile.getMovieFile(), "r");
+		raf.seek(mayBeMovieFile.getCacho().getFirstByteIndex());
 		int read = -1;
 		ChannelBuffer outBuffer = ChannelBuffers.buffer(request.getLength());
 		long readBytesCOunt = 0;
@@ -40,6 +40,8 @@ public class CachoServerHandler extends SimpleChannelHandler {
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		} finally {
+			raf.close();
 		}
 		System.out.println("Sending " + outBuffer.readableBytes() + " bytes");
 		e.getChannel().write(outBuffer).addListener(ChannelFutureListener.CLOSE);

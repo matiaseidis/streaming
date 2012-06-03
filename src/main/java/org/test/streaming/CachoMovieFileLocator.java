@@ -13,7 +13,7 @@ public class CachoMovieFileLocator extends LibraryBasedMovieFileLocator {
 	}
 
 	@Override
-	public File locate(CachoRequest request) {
+	public MovieCachoFile locate(CachoRequest request) {
 		String[] allMovieFileNames = this.getLibraryPath().list();
 		for (int i = 0; i < allMovieFileNames.length; i++) {
 			String eachMovieFileName = allMovieFileNames[i];
@@ -23,7 +23,7 @@ public class CachoMovieFileLocator extends LibraryBasedMovieFileLocator {
 					if (moviePartMetadata.getCacho().contains(request.getCacho())) {
 						File movieFile = new File(this.getLibraryPath(), eachMovieFileName);
 						if (movieFile.exists()) {
-							return movieFile;
+							return new MovieCachoFile(moviePartMetadata.getCacho().subCacho(request.getCacho()), movieFile);
 						}
 					}
 				} catch (InvalidMovieMetadataException e2) {
