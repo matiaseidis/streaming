@@ -1,6 +1,8 @@
 package org.test.streaming;
 
-import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -28,24 +30,25 @@ public class CachoServerHandler extends SimpleChannelHandler {
 		System.out.println("Cacho file " + mayBeMovieFile);
 		RandomAccessFile raf = new RandomAccessFile(mayBeMovieFile.getMovieFile(), "r");
 		raf.seek(mayBeMovieFile.getCacho().getFirstByteIndex());
-		int read = -1;
-		ChannelBuffer outBuffer = ChannelBuffers.buffer(request.getLength());
-		long readBytesCOunt = 0;
+		int b = 1024 * 1024 * 4;
+		InputStream fileInputStream = new BufferedInputStream(new FileInputStream(raf.getFD()), b);
 		try {
-			while ((read = raf.read()) != -1 && readBytesCOunt < request.getLength()) {
-				// TODO mandar el archivo de a rafagas, no esperar a leerlo
-				// todo, para no ocupar mucha memoria
-				outBuffer.writeByte(read);
-				readBytesCOunt++;
+			int s = request.getLength() / b;
+			ChannelBuffer outBuffer = ChannelBuffers.buffer(b);
+			for (int i = 0; i < s; i++) {
+				while (outBuffer.writable()) {
+					outBuffer.writeByte(fileInputStream.read());
+				}
+				e.getChannel().write(outBuffer);
+				outBuffer.clear();
 			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			while (outBuffer.readableBytes() < s % b) {
+				outBuffer.writeByte(fileInputStream.read());
+			}
+			e.getChannel().write(outBuffer).addListener(ChannelFutureListener.CLOSE);
 		} finally {
-			raf.close();
+			fileInputStream.close();
 		}
-		System.out.println("Sending " + outBuffer.readableBytes() + " bytes");
-		e.getChannel().write(outBuffer).addListener(ChannelFutureListener.CLOSE);
-		System.out.println("Cacho written.");
 	}
 
 	public MovieFileLocator getMovieFileLocator() {

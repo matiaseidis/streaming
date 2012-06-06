@@ -26,7 +26,6 @@ public class CachoClientJandler extends SimpleChannelHandler {
 	@Override
 	public synchronized void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		ChannelBuffer cacho = (ChannelBuffer) e.getMessage();
-		System.out.println("Received " + cacho.readableBytes() + " bytes");
 		cacho.readBytes(out, cacho.readableBytes());
 	}
 

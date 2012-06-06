@@ -7,11 +7,15 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class CachoRequester {
@@ -27,7 +31,8 @@ public class CachoRequester {
 			CachoRequest request = cachoRetrieval.getRequest();
 			cachoRequester.requestCacho(request.getFileName(), request.getFirstByteIndex(), request.getLength(), baos);
 		}
-		System.out.println(baos);
+		// 421732944
+		System.out.println("Total Received: " + (5570947 - baos.size()) + " bytes.");
 	}
 
 	public CachoRequester(String host, int port) {
