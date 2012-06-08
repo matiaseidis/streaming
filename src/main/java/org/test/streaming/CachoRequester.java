@@ -1,6 +1,10 @@
 package org.test.streaming;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -23,8 +27,8 @@ public class CachoRequester {
 	private final String host;
 	private final int port;
 
-	public static void main(String[] args) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	public static void main(String[] args) throws IOException {
+		FileOutputStream baos = new FileOutputStream(new File("out.mp4"));
 		List<CachoRetrieval> requests = new DummyMovieRetrievalPlan().getRequests();
 		for (CachoRetrieval cachoRetrieval : requests) {
 			CachoRequester cachoRequester = new CachoRequester(cachoRetrieval.getHost(), cachoRetrieval.getPort());
@@ -32,7 +36,10 @@ public class CachoRequester {
 			cachoRequester.requestCacho(request.getFileName(), request.getFirstByteIndex(), request.getLength(), baos);
 		}
 		// 421732944
-		System.out.println("Total Received: " + (5570947 - baos.size()) + " bytes.");
+		// 5570947
+		baos.flush();
+		baos.close();
+
 	}
 
 	public CachoRequester(String host, int port) {
