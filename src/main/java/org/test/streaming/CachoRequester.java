@@ -52,6 +52,8 @@ public class CachoRequester {
 
 		// Start the connection attempt.
 		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+		bootstrap.setOption("tcpNoDelay", true);
+		bootstrap.setOption("keepAlive", true);
 		// Wait until the connection is closed or the connection attempt fails.
 		future.getChannel().getCloseFuture().awaitUninterruptibly();
 		// Shut down thread pools to exit.

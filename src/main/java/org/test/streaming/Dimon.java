@@ -29,6 +29,8 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 				return Channels.pipeline(new ObjectDecoder(), new CachoServerHandler());
 			}
 		});
+		bootstrap.setOption("child.tcpNoDelay", true);
+		bootstrap.setOption("child.keepAlive", true);
 
 		// Bind and start to accept incoming connections.
 		bootstrap.bind(new InetSocketAddress(port));
