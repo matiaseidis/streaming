@@ -5,3 +5,4 @@ target/
 cachos.log
 *.mp4
 *.part
+*.log*
