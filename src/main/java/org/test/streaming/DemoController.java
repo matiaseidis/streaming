@@ -22,7 +22,7 @@ public class DemoController {
 	private final static String contentTypeMP4 = "video/mp4";
 
 	@RequestMapping(value="stream/{peli}", method = RequestMethod.GET)
-	public void add(@PathVariable String peli, HttpServletResponse response){
+	public void play(@PathVariable String peli, HttpServletResponse response){
 		
 		try {
 			response.setBufferSize(bufferSize);

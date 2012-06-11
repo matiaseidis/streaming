@@ -21,15 +21,15 @@ http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<context:annotation-config />
 
-	<bean id="local.tracking" class="org.test.streaming.prevalence.LocalTracking"></bean>
+<!-- 	<bean id="local.tracking" class="org.test.streaming.prevalence.LocalTracking"></bean> -->
 	
 <!-- 	<bean id="file.system.monitor" class="org.test.streaming.monitor.FSM" init-method="begin" ></bean> -->
-	<bean id="shared.videos.listener" class="org.test.streaming.monitor.SharedVideosListener" init-method="begin" ></bean>
+<!-- 	<bean id="shared.videos.listener" class="org.test.streaming.monitor.SharedVideosListener" init-method="begin" ></bean> -->
 	
-	<bean id="notifier" class="org.test.streaming.monitor.Notifier"></bean>
+<!-- 	<bean id="notifier" class="org.test.streaming.monitor.Notifier"></bean> -->
 	
-	<bean id="base.model" class="org.test.streaming.prevalence.BaseModel" init-method="init">
-		<property name="prevalenceDirectory" value="${user.home}/${prevalence.directory}"></property>
-	</bean>
+<!-- 	<bean id="base.model" class="org.test.streaming.prevalence.BaseModel" init-method="init"> -->
+<!-- 		<property name="prevalenceDirectory" value="${user.home}/${prevalence.directory}"></property> -->
+<!-- 	</bean> -->
 
 </beans>
