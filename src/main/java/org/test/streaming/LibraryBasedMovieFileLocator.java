@@ -2,16 +2,27 @@ package org.test.streaming;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class LibraryBasedMovieFileLocator implements MovieFileLocator {
 
-	private File libraryPath = new File("./");
+	protected static final Log log = LogFactory.getLog(LibraryBasedMovieFileLocator.class);
+
+	private File libraryPath;
 
 	public LibraryBasedMovieFileLocator(String libraryDirPath) {
-		this.setLibraryPath(new File(libraryDirPath));
+		this(new File(libraryDirPath));
 	}
 
 	public LibraryBasedMovieFileLocator(File libraryDirPath) {
-		this.setLibraryPath(libraryDirPath);
+		if (libraryDirPath.exists()) {
+			this.setLibraryPath(libraryDirPath);
+			log.info("Library path: " + libraryDirPath);
+		} else {
+			throw new IllegalArgumentException("Library path " + libraryDirPath + " does not exist.");
+		}
+
 	}
 
 	public File getLibraryPath() {
