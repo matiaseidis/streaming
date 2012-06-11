@@ -13,7 +13,6 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		int totalRequested = 0;
 		int requestSize = 1024 * 1024 * 64;
 		int amountOfRequests = 0;
-		System.err.println((totalSize / requestSize) + 1);
 		
 		String movieFileName = Conf.VIDEO;
 		while (totalSize - totalRequested >= requestSize) {
@@ -25,3 +24,4 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		return requests;
 	}
 }
+		
