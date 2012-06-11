@@ -1,8 +1,5 @@
 package org.test.streaming.prevalence;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.apache.log4j.Logger;
 import org.prevayler.Prevayler;
 import org.prevayler.PrevaylerFactory;
@@ -14,13 +11,12 @@ public class BaseModel {
 	
 public Logger logger = Logger.getLogger(getClass());
 	
-	@Setter private String prevalenceDirectory;
-	@Getter private Prevayler prevayler;
-	@Setter private PrevaylerFactory prevaylerFactory;
+	private String prevalenceDirectory = Conf.PREVALENCE_DIR;
+	private Prevayler prevayler;
+	private final PrevaylerFactory prevaylerFactory;
 	
-	public BaseModel(){}
-	
-	public void init(){
+	public BaseModel(){
+		
 		prevaylerFactory = new PrevaylerFactory();
 		prevaylerFactory.configurePrevalenceDirectory(prevalenceDirectory);
 		prevaylerFactory.configurePrevalentSystem(new LocalTracking());
@@ -36,18 +32,22 @@ public Logger logger = Logger.getLogger(getClass());
 		XStreamSerializer s = new XStreamSerializer();
 		prevaylerFactory.configureJournalSerializer(s);
 		prevaylerFactory.configureSnapshotSerializer(s);
-
+		
 		try{
-		prevayler = prevaylerFactory.create(); 
+			prevayler = prevaylerFactory.create(); 
 		}catch(Exception e){
 			logger.error("FAILED TO LOAD PREVALENT SYSTEM " + e);
 			logger.error(e.getMessage());
 			System.exit(1);
-		}
+		} 
 	}
 	
 	public LocalTracking getModel(){
 		return (LocalTracking) prevayler.prevalentSystem();
+	}
+
+	public Prevayler getPrevayler() {
+		return prevayler;
 	}
 	
 }

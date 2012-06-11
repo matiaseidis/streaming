@@ -4,55 +4,27 @@
 
 <web-app>
 	<display-name>Streaming demo</display-name>
-<!-- 	<servlet> -->
-<!-- 		<servlet-name>s</servlet-name> -->
-<!-- 		<servlet-class>org.test.streaming.Demo</servlet-class> -->
-<!-- 	</servlet> -->
-<!-- 	<servlet> -->
-<!-- 		<servlet-name>u</servlet-name> -->
-<!-- 		<servlet-class>org.test.streaming.Upload</servlet-class> -->
-<!-- 	</servlet> -->
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>u</servlet-name> -->
-<!-- 		<url-pattern>/upload/*</url-pattern> -->
-<!-- 	</servlet-mapping> -->
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>s</servlet-name> -->
-<!-- 		<url-pattern>/stream/*</url-pattern> -->
-<!-- 	</servlet-mapping> -->
-
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring-*.xml</param-value>
-		<!-- <param-value>/WEB-INF/spring-context.xml</param-value> -->
-	</context-param>
 
 	<context-param>
 		<param-name>log4jConfigLocation</param-name>
 		<param-value>/WEB-INF/classes/log4j.properties</param-value>
 	</context-param>
 
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener
-		</listener-class>
-	</listener>
-
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
-	
-	<!-- FIXME default servlet container handling for static info like subtitles-->
-<servlet>
-		<servlet-name>dispatcher</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet
-		</servlet-class>
-		<load-on-startup>1</load-on-startup>
+	<servlet>
+		<servlet-name>s</servlet-name>
+		<servlet-class>org.test.streaming.Demo</servlet-class>
 	</servlet>
-
+	<servlet>
+		<servlet-name>u</servlet-name>
+		<servlet-class>org.test.streaming.Upload</servlet-class>
+	</servlet>
 	<servlet-mapping>
-		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>/</url-pattern>
+		<servlet-name>u</servlet-name>
+		<url-pattern>/upload/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>s</servlet-name>
+		<url-pattern>/stream/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>

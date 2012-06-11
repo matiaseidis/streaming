@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import lombok.Getter;
-
 public class Cachos implements Serializable{
 	
-	@Getter private final CopyOnWriteArrayList<Cacho> cachos = new CopyOnWriteArrayList<Cacho>();
+	private final CopyOnWriteArrayList<Cacho> cachos = new CopyOnWriteArrayList<Cacho>();
 
 	public boolean addCacho(Cacho newCacho) {
 		List<Cacho> toAdd = new ArrayList<Cacho>();
@@ -32,6 +30,10 @@ public class Cachos implements Serializable{
 		cachos.addAll(toAdd);
 		
 		return !toAdd.isEmpty();
+	}
+
+	public CopyOnWriteArrayList<Cacho> getCachos() {
+		return cachos;
 	}
 	
 }

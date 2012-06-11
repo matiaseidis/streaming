@@ -11,18 +11,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.test.streaming.Conf;
 import org.test.streaming.prevalence.BaseModel;
-import org.test.streaming.prevalence.Cacho;
 import org.test.streaming.prevalence.LocalTracking;
 import org.test.streaming.prevalence.transaction.AddCachoToLocalDB;
 import org.test.streaming.prevalence.transaction.AddVideoToLocalDB;
@@ -31,23 +26,28 @@ public class SharedVideosListener implements FileAlterationListener {
 
 	public Logger logger = Logger.getLogger(getClass());
 	
-	@Autowired @Setter @Getter private Notifier notifier;
-	@Autowired @Setter @Getter private BaseModel baseModel;
+	private Notifier notifier = new Notifier();
+	private final BaseModel baseModel;
 	
 	private final ExecutorService pool = Executors.newFixedThreadPool(20);
 
-	FileAlterationObserver observer = new FileAlterationObserver(MONITORED_DIR);
-	FileAlterationMonitor monitor = new FileAlterationMonitor(INTERVAL);
-	
-	private static final String MONITORED_DIR = Conf.VIDEO_DIR;
-	private static final long INTERVAL = 3000;
-	
 	/*
 	 * TODO pedirle el user al dimon 
 	 */
 	private static final String USER_ID = Conf.USER_ID;
+
 	private static final String IP = Conf.DIMON_HOST;
 	private static final int PORT = Conf.DIMON_PORT;
+	private static final String MONITORED_DIR = Conf.VIDEO_DIR;
+	private static final long INTERVAL = Conf.MONITOR_INTERVAL;
+
+	FileAlterationObserver observer = new FileAlterationObserver(MONITORED_DIR);
+	FileAlterationMonitor monitor = new FileAlterationMonitor(INTERVAL);
+	
+	public SharedVideosListener(BaseModel baseModel){
+		this.baseModel = baseModel;
+	}
+	
 
 	public void begin() throws Exception {
 		
@@ -73,11 +73,7 @@ public class SharedVideosListener implements FileAlterationListener {
 					
 					String [] meta = meta(file);
 					result = notifier.removeCacho(USER_ID, videoId, Long.valueOf(meta[0]), Long.valueOf(meta[1]));
-					
-					System.out.println("cachos:");
-					System.out.println(notifier.listCachos(videoId));
-					System.out.println("videos:");
-					System.out.println(notifier.listVideos(videoId));
+
 				}
 				return result;
 			}
@@ -88,7 +84,7 @@ public class SharedVideosListener implements FileAlterationListener {
 	public void onFileCreate(final File newFile) {
 
 		/*
-		 * por ahora, solo soporte para mp4
+		 * por ahora, solo soporte para mp4 y parts
 		 */
 		if ( !newFile.getName().endsWith(".mp4") && !newFile.getName().endsWith(".part")){
 			return;
@@ -278,6 +274,11 @@ public class SharedVideosListener implements FileAlterationListener {
 	@Override
 	public void onStop(FileAlterationObserver observer) {
 //		System.out.println("FSM.begin().new FileAlterationListener() {...}.onStop()");
+	}
+
+
+	public BaseModel getBaseModel() {
+		return baseModel;
 	}
 
 }
