@@ -25,7 +25,7 @@ clip: {
     autoBuffering:true,
     scaling:'fit',
     url: 'stream/sandonga.mp4',
-    captionUrl: 'http://186.23.108.31:8080/streaming-client/Luther-02x01-SP.srt',
+    captionUrl: 'Luther-02x01-SP.srt',
 	provider: 'lighthttpd'
 },
 plugins: {

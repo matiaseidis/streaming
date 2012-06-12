@@ -1,5 +1,6 @@
 package org.test.streaming;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,7 +23,8 @@ public class Subtitle extends HttpServlet {
 
 		try {
 
-			InputStream fis = getServletContext().getResourceAsStream(Conf.SUBS);
+			
+			InputStream fis = new FileInputStream(Conf.VIDEO_DIR + Conf.SUBS);
 
 			resp.setBufferSize(256);
 			resp.setContentType("text/plain");
