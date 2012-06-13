@@ -52,6 +52,8 @@ public class DirectCachoStreamer extends CachoStreamer {
 		this.getBuffer().writeTo(new BufferedOutputStream(f));
 		f.flush();
 		f.close();
+		MovieCachoFile newCacho = new MovieCachoFile(new MovieCacho(0, this.getCachoLength()), this.getCachoFile());
+		this.getIndex().newCachoAvailableLocally(newCacho);	
 		log.debug("[" + 0 + "," + (this.getCount() - 1) + "] -  Downladed, streamed and saved to " + this.getCachoFile());
 		this.getWhatToDo().onCachoComplete(this);
 	}

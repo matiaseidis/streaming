@@ -1,6 +1,5 @@
 package org.test.streaming;
 
-import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
