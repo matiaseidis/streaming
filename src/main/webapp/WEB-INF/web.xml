@@ -10,14 +10,14 @@
 		<param-value>/WEB-INF/classes/log4j.properties</param-value>
 	</context-param>
 	
-	 <filter>
-        <filter-name>cross-origin</filter-name>
-        <filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>cross-origin</filter-name>
-        <url-pattern>/</url-pattern>
-    </filter-mapping>
+<!-- 	 <filter> -->
+<!--         <filter-name>cross-origin</filter-name> -->
+<!--         <filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class> -->
+<!--     </filter> -->
+<!--     <filter-mapping> -->
+<!--         <filter-name>cross-origin</filter-name> -->
+<!--         <url-pattern>/</url-pattern> -->
+<!--     </filter-mapping> -->
 
 	<servlet>
 		<servlet-name>s</servlet-name>
@@ -27,10 +27,6 @@
 		<servlet-name>u</servlet-name>
 		<servlet-class>org.test.streaming.Upload</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>subs</servlet-name>
-		<servlet-class>org.test.streaming.Subtitle</servlet-class>
-	</servlet>
 	<servlet-mapping>
 		<servlet-name>u</servlet-name>
 		<url-pattern>/upload/*</url-pattern>
@@ -39,14 +35,10 @@
 		<servlet-name>s</servlet-name>
 		<url-pattern>/stream/*</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>subs</servlet-name>
-		<url-pattern>*.srt</url-pattern>
-	</servlet-mapping>
 	
 	<servlet-mapping>
 		<servlet-name>default</servlet-name>
-<!-- 		<url-pattern>*.srt</url-pattern> -->
+		<url-pattern>*.srt</url-pattern>
 		<url-pattern>*.css</url-pattern>
 		<url-pattern>*.js</url-pattern>
 		<url-pattern>*.png</url-pattern>

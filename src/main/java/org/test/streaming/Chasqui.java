@@ -26,33 +26,28 @@ public class Chasqui implements Index {
 			return;
 		}
 		
-		int cachoFrom = 0;
-		int cachoTo = 0;
-		int cachoLenght = 0;
-		int nextPedazoFrom = 0;
-		int pedazoSize = 0;
+		int cachoFrom = movieCachoFile.getCacho().getFirstByteIndex();
+		int cachoLenght = movieCachoFile.getCacho().getLength();
+		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
+		int totalPedazos = (cachoLenght - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
 		
-		int vecesAbsolutas = cachoLenght / pedazoSize;
-		
-		nextPedazoFrom = cachoFrom % pedazoSize == 0 ? cachoFrom : cachoFrom + pedazoSize;
-		
-		while(true){
-			if(!(nextPedazoFrom+INDEXABLE_SIZE < movieCachoFile.getCacho().getLength()))
-				break;
-			sendToRepository(videoId(movieCachoFile.getMovieFile()), nextPedazoFrom/INDEXABLE_SIZE);
+		for(int i = 0; i < totalPedazos; i++){
+			String pedazoId = generateId(movieCachoFile.getMovieFile());
+			int ordinal = nextPedazoFrom/INDEXABLE_SIZE - 1; // base 0 ???
+			String fileName = movieCachoFile.getMovieFile().getName();
+			sendToRepository(fileName, pedazoId, ordinal);
 			nextPedazoFrom += INDEXABLE_SIZE;
 		}
-
-//		log.info(pedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
+		log.info(totalPedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
 	}
 	
 
-	private void sendToRepository(String videoId, int pedazoIndex){
-		System.out.println("TODO");
+	private void sendToRepository(String fileName, String pedazoId, int pedazoOrdinal){
+		System.out.println("Sended by Chasqui to remote repo <fileName: "+fileName+" - pedazo: "+pedazoId+" ["+pedazoOrdinal+"]>");
 	}
 	
 	
-	private String videoId(File file) {
+	private String generateId(File file) {
 			MessageDigest md = null;
 			try {
 				md = MessageDigest.getInstance("SHA-1");

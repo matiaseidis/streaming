@@ -2,6 +2,9 @@ package org.test.streaming;
 
 public class Conf {
 
+//	public static final String VIDEO = "Alcatraz.S01E11.Webb.Porter.HDTV.x264-LOL.mp4";
+//	public static final String VIDEO_DIR = "/home/matias/cachos/files/";
+//	public static final int VIDEO_SIZE = 248079992;
 	
 	public static final String VIDEO = "Luther.S02E01.720p.HDTV.x264-3.mp4";
 	public static final String VIDEO_DIR = "/home/matias/cachos/files/";
@@ -12,6 +15,7 @@ public class Conf {
 //	public static final int VIDEO_SIZE = 393031408;
 	
 	public static final String DIMON_HOST = "localhost";
+//	public static final String DIMON_HOST = "cronopio.dyndns.org";
 	public static final int DIMON_PORT = 10002;
 	
 	public static final String USER_ID = "demo.user.0";
