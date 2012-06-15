@@ -4,7 +4,7 @@ import java.io.OutputStream;
 
 public abstract class CachoStreamer extends OutputStream {
 
-	private Index index = new NullIndex();
+	private Index index = new Chasqui();
 
 	public abstract void stream();
 
