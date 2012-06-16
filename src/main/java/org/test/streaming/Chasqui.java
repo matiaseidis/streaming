@@ -7,16 +7,21 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import junit.framework.Assert;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.test.streaming.monitor.Notifier;
 
 public class Chasqui implements Index {
 
 	protected static final Log log = LogFactory.getLog(Chasqui.class);
-	private static final int INDEXABLE_SIZE = 1024;
+	private static final int INDEXABLE_SIZE = 1024 * 1024;
+	private Notifier notifier = Notifier.getInstance();
 	
 	@Override
 	public void newCachoAvailableLocally(MovieCachoFile movieCachoFile) {
@@ -26,33 +31,44 @@ public class Chasqui implements Index {
 			return;
 		}
 		
-		int cachoFrom = 0;
-		int cachoTo = 0;
-		int cachoLenght = 0;
-		int nextPedazoFrom = 0;
-		int pedazoSize = 0;
+		int cachoFrom = movieCachoFile.getCacho().getFirstByteIndex();
+		int cachoLenght = movieCachoFile.getCacho().getLength();
+		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
+		int totalPedazos = (cachoLenght - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
+		String fileName = movieCachoFile.getMovieFile().getName();
 		
-		int vecesAbsolutas = cachoLenght / pedazoSize;
-		
-		nextPedazoFrom = cachoFrom % pedazoSize == 0 ? cachoFrom : cachoFrom + pedazoSize;
-		
-		while(true){
-			if(!(nextPedazoFrom+INDEXABLE_SIZE < movieCachoFile.getCacho().getLength()))
-				break;
-			sendToRepository(videoId(movieCachoFile.getMovieFile()), nextPedazoFrom/INDEXABLE_SIZE);
+		/*
+		 * partes de 1mb en la que indexo este cacho
+		 */
+		Map<Integer, String> pedazos = new HashMap<Integer, String>();
+
+		for(int i = 0; i < totalPedazos; i++){
+			
+			String chunkId = generateId(movieCachoFile.getMovieFile(), nextPedazoFrom, movieCachoFile.getCacho().getFirstByteIndex(), false);
+			int ordinal = nextPedazoFrom/INDEXABLE_SIZE; // base 0 ???
+			pedazos.put(ordinal, chunkId);
 			nextPedazoFrom += INDEXABLE_SIZE;
 		}
-
-//		log.info(pedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
+		
+		StringBuilder sb = new StringBuilder();
+		for(Map.Entry<Integer,String> entry : pedazos.entrySet()){
+			sb.append(entry.getKey()+"!"+entry.getValue()+"&");
+		}
+		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
+		sendToRepository(fileName, sb.toString());
+		log.info(totalPedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
 	}
 	
 
-	private void sendToRepository(String videoId, int pedazoIndex){
-		System.out.println("TODO");
+	private void sendToRepository(String fileName, String chunks){
+
+		notifier.registerParts(fileName, chunks);
+		
+		System.out.println("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]>");
 	}
 	
 	
-	private String videoId(File file) {
+	private String generateId(File file, int chunkFrom, int cachoFrom, boolean fullVideoId) {
 			MessageDigest md = null;
 			try {
 				md = MessageDigest.getInstance("SHA-1");
@@ -65,8 +81,16 @@ public class Chasqui implements Index {
 			
 			try {
 				FileInputStream fis = new FileInputStream(file);
+
+//				Assert.assertTrue(chunkFrom - cachoFrom == 
+						fis.skip(chunkFrom - cachoFrom);
+//				);
+				
 				while(fis.read(bytes) != -1){
 					md.update(bytes);
+					if(!fullVideoId){
+						break;
+					}
 				}
 				bytes = null;
 			} catch (FileNotFoundException e1) {
@@ -83,8 +107,50 @@ public class Chasqui implements Index {
 			while(hashtext.length() < 32 ){
 				hashtext = "0"+hashtext;
 			}
-			log.info("hashed video: " +file.getName()+" - "+hashtext);
+			log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+chunkFrom);
 			return hashtext;
+	}
+	
+	public static void main(String[] args) {
+		new Chasqui().registerVideo();
+	}
+
+
+	private void registerVideo() {
+		File file = new File(Conf.VIDEO_DIR+Conf.VIDEO);
+		String hash = this.generateId(file, 0, 0, true);
+		
+		int cachoFrom = 0;
+		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
+		int totalPedazos = (Conf.VIDEO_SIZE - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
+		
+		/*
+		 * partes de 1mb en la que indexo este cacho
+		 */
+//		Map<Integer, String> pedazos = new HashMap<Integer, String>();
+		StringBuilder sb = new StringBuilder();
+
+		for(int i = 0; i < totalPedazos; i++){
+			
+			String chunkId = generateId(file, nextPedazoFrom, 0, false);
+			int ordinal = nextPedazoFrom/INDEXABLE_SIZE; // base 0 ???
+//			pedazos.put(ordinal, chunkId);
+			
+			System.out.println("oridinal: " + i + "id: "+ chunkId);
+			
+			sb.append(chunkId+"!");
+			nextPedazoFrom += INDEXABLE_SIZE;
+		}
+		
+//		for(Map.Entry<Integer,String> entry : pedazos.entrySet()){
+//		}
+		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
+		
+		String resp = notifier.registerVideo(hash, Conf.VIDEO, Conf.VIDEO_SIZE, sb.toString());
+		System.out.println(resp);
+		
+		System.out.println(hash+" - "+Conf.VIDEO+" - "+ Conf.VIDEO_SIZE+" - "+ sb.toString());
+		
 	}
 
 }

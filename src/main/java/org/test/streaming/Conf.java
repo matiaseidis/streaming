@@ -6,9 +6,12 @@ public class Conf {
 //	public static final String VIDEO_DIR = "/home/matias/cachos/files/";
 //	public static final int VIDEO_SIZE = 248079992;
 	
-	public static final String VIDEO = "Luther.S02E01.720p.HDTV.x264-3.mp4";
+//	public static final String VIDEO = "Luther.S02E01.720p.HDTV.x264-3.mp4";
+	public static final String VIDEO = "Pixar_-_Boundin_(Short_Film).avi";
 	public static final String VIDEO_DIR = "/home/matias/cachos/files/";
-	public static final int VIDEO_SIZE = 421732944;
+//	public static final int VIDEO_SIZE = 421732944;
+	public static final int VIDEO_SIZE = 31127552 ;
+	 
 	
 //	public static final String VIDEO = "Game.of.Thrones.S02E01.HDTV.RM-ASAP.mp4";
 //	public static final String VIDEO_DIR = "/home/meidis/Videos/";
