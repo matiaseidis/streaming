@@ -58,22 +58,23 @@ public class H264Encoder implements Encoder{
 	protected static final Log log = LogFactory
 			.getLog(H264Encoder.class);
 
-	private static final String ENCODING_FOLDER = "/home/matias/Escritorio/L/";
-	private final String FILE;
-	private static final String BUFFER = "/dev/null";
-	private static final String TEMP_SUFFIX = "_TEMP_";
-	private static final String ORIGINAL_EXTENSION = "mkv";
-	private static final String TARGET_EXTENSION = "mp4";
+	private String encodingFolder = "/home/matias/Escritorio/L/";
+	private String fileName;
+	private String buffer = "/dev/null";
+	private String tempSuffix = "_TEMP_";
+	private String originalExtension = "mkv";
+	private String targetExtension = "mp4";
+	private int fixedVideoBitRate = 875;
 
 	public H264Encoder(String file){
-		this.FILE = file;
+		this.fileName = file;
 	}
 	
 	/*
 	 * TODO delete me 
 	 */
 	public H264Encoder(){
-		this.FILE = "/home/matias/Descargas/decargasQueQueremos/vuze/Luther_Season_2_Complete_720p/Luther.S02E01.720p.HDTV.x264.mkv";
+		this.fileName = "/home/matias/Descargas/decargasQueQueremos/vuze/Luther_Season_2_Complete_720p/Luther.S02E01.720p.HDTV.x264.mkv";
 	}
 	
 	public static void main(String[] args)
@@ -95,10 +96,10 @@ public class H264Encoder implements Encoder{
 		// Create a Xuggler container object
 		IContainer container = IContainer.make();
 
-		String inFile = FILE;
-		String buffer = BUFFER;
-		String tempFile = ENCODING_FOLDER+FILE.replace(ORIGINAL_EXTENSION, TEMP_SUFFIX)+TARGET_EXTENSION;
-		String outFile = tempFile.replace(TEMP_SUFFIX, StringUtils.EMPTY);
+		String inFile = this.fileName;
+		String buffer = this.buffer;
+		String tempFile = encodingFolder+fileName.replace(originalExtension, tempSuffix)+targetExtension;
+		String outFile = tempFile.replace(tempSuffix, StringUtils.EMPTY);
 		int videoBitRate = 0; 
 		int videoHeight = 0; 
 		String audioCodec = null; 
@@ -110,7 +111,7 @@ public class H264Encoder implements Encoder{
 
 		// query how many streams the call to open found
 		int numStreams = container.getNumStreams();
-		videoBitRate = container.getBitRate()/1000;
+		videoBitRate = fixedVideoBitRate(container.getBitRate()/1000);
 
 		// and iterate through the streams to print their meta data
 		for(int i = 0; i < numStreams; i++)
@@ -157,10 +158,14 @@ public class H264Encoder implements Encoder{
 
 	}
 
+	private int fixedVideoBitRate(int i) {
+		return i >= fixedVideoBitRate ? fixedVideoBitRate : i;
+	}
+
 	public void launchEncoding(List<String> procs) throws IOException{
 		for(String proc : procs){
 			log.debug("About to launch " + proc);
-			Process process = Runtime.getRuntime().exec(proc, new String[0], new File(ENCODING_FOLDER));
+			Process process = Runtime.getRuntime().exec(proc, new String[0], new File(encodingFolder));
 			InputHandler errorHandler = new
 					InputHandler(process.getErrorStream(), "Error Stream");
 			errorHandler.start();
