@@ -20,6 +20,8 @@ package org.test.streaming.xuggler;
  *******************************************************************************/
 
 
+import org.test.streaming.Conf;
+
 import com.xuggle.mediatool.IMediaReader;
 import com.xuggle.mediatool.IMediaViewer.Mode;
 import com.xuggle.mediatool.ToolFactory;
@@ -36,7 +38,7 @@ public class Demo {
 	
 	public static void main(String[] args) {
 		// create a media reader
-		IMediaReader reader = ToolFactory.makeReader("/home/meidis/Videos/Lorenzo's.Oil.1992.DVDRip.XviD.AR.avi");
+		IMediaReader reader = ToolFactory.makeReader(Conf.VIDEO_DIR+Conf.VIDEO);
 		
 		// add a viewer to the reader, to see the decoded media
 		reader.addListener(ToolFactory.makeWriter("output.mp4", reader));

@@ -78,13 +78,9 @@ public class Chasqui implements Index {
 			md.reset();
 
 			byte[] bytes = new byte[1024];
-			
 			try {
 				FileInputStream fis = new FileInputStream(file);
-
-//				Assert.assertTrue(chunkFrom - cachoFrom == 
-						fis.skip(chunkFrom - cachoFrom);
-//				);
+				fis.skip(chunkFrom - cachoFrom);
 				
 				while(fis.read(bytes) != -1){
 					md.update(bytes);
@@ -127,29 +123,20 @@ public class Chasqui implements Index {
 		/*
 		 * partes de 1mb en la que indexo este cacho
 		 */
-//		Map<Integer, String> pedazos = new HashMap<Integer, String>();
 		StringBuilder sb = new StringBuilder();
 
 		for(int i = 0; i < totalPedazos; i++){
 			
 			String chunkId = generateId(file, nextPedazoFrom, 0, false);
-			int ordinal = nextPedazoFrom/INDEXABLE_SIZE; // base 0 ???
-//			pedazos.put(ordinal, chunkId);
-			
-			System.out.println("oridinal: " + i + "id: "+ chunkId);
-			
+			log.info("oridinal: " + i + "id: "+ chunkId);
 			sb.append(chunkId+"!");
 			nextPedazoFrom += INDEXABLE_SIZE;
 		}
 		
-//		for(Map.Entry<Integer,String> entry : pedazos.entrySet()){
-//		}
 		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
 		
-		String resp = notifier.registerVideo(hash, Conf.VIDEO, Conf.VIDEO_SIZE, sb.toString());
-		System.out.println(resp);
-		
-		System.out.println(hash+" - "+Conf.VIDEO+" - "+ Conf.VIDEO_SIZE+" - "+ sb.toString());
+		notifier.registerVideo(hash, Conf.VIDEO, Conf.VIDEO_SIZE, sb.toString());
+		log.info("Hashed full video: "+hash+" - "+Conf.VIDEO+" - "+ Conf.VIDEO_SIZE+" - "+ sb.toString());
 		
 	}
 
