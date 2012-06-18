@@ -9,11 +9,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 import org.test.streaming.Conf;
+
+import com.google.gson.Gson;
 
 public class Notifier {
 	
@@ -27,12 +31,26 @@ public class Notifier {
 	
 	
 	
-	public String listCachos(String videoId){
+	public List<String> listChunks(String videoId){
 		
 		Assert.state(StringUtils.isNotEmpty(videoId));
 
-		return sendRequest("cacho/list/"+videoId);	
+		String response = sendRequest("video/getChunks/"+videoId+"/"+Conf.USER_ID);
+		
+		Gson gson = new Gson();
+		List<String> chunkIds = gson.fromJson(response, List.class);
+		
+		return chunkIds;  	
 	}
+
+	private List<String> toCkunkList(String response) {
+		
+		List<String> result = new ArrayList<String>(); 
+		
+		return result;
+	}
+
+
 
 	public String listVideos(String videoId){
 		

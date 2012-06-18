@@ -8,9 +8,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -42,6 +41,17 @@ public class Chasqui implements Index {
 		 */
 		Map<Integer, String> pedazos = new HashMap<Integer, String>();
 
+		
+		/*
+		 * TODO FIXME aca tengo que tener el id porque estoy descargandome el video...
+		 */
+		String videoId = "d1a27cdb480dbd3f9d1adbca766cb44e98fd6db8"; 
+		
+		/*
+		 * TODO cachear esto?
+		 */
+		List<String> videoChunks = notifier.listChunks(videoId); 
+		
 		for(int i = 0; i < totalPedazos; i++){
 			
 			String chunkId = generateId(movieCachoFile.getMovieFile(), nextPedazoFrom, movieCachoFile.getCacho().getFirstByteIndex(), false);
@@ -52,21 +62,16 @@ public class Chasqui implements Index {
 		
 		StringBuilder sb = new StringBuilder();
 		for(Map.Entry<Integer,String> entry : pedazos.entrySet()){
-			sb.append(entry.getKey()+"!"+entry.getValue()+"&");
+			if(entry.getValue().equals(videoChunks.get(entry.getKey())))
+				sb.append(entry.getKey()+"!"+entry.getValue()+"&");
 		}
-		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
-		sendToRepository(fileName, sb.toString());
-		log.info(totalPedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
-	}
-	
-
-	private void sendToRepository(String fileName, String chunks){
-
-		notifier.registerParts(fileName, chunks);
+		if(sb.length()>1)
+			sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
 		
-		System.out.println("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]>");
+		String chunks = sb.toString();
+		notifier.registerParts(fileName, chunks);
+		log.info("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]> - "+totalPedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
 	}
-	
 	
 	private String generateId(File file, int chunkFrom, int cachoFrom, boolean fullVideoId) {
 			MessageDigest md = null;
