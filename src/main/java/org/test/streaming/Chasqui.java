@@ -43,9 +43,9 @@ public class Chasqui implements Index {
 
 		
 		/*
-		 * TODO FIXME aca tengo que tener el id porque estoy descargandome el video...
+		 * TODO FIXME aca tengo que tener el id porque estoy descargandome el video (param) ...
 		 */
-		String videoId = "d1a27cdb480dbd3f9d1adbca766cb44e98fd6db8"; 
+		String videoId = Conf.VIDEO_ID_FOR_TESTING; 
 		
 		/*
 		 * TODO cachear esto?

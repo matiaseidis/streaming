@@ -59,11 +59,12 @@ public class Notifier {
 		return sendRequest("video/list");	
 	}
 
-	public String getGrafo(String videoId){
+	public String getGrafo(String videoId, String userId){
 		
 		Assert.state(StringUtils.isNotEmpty(videoId));
+		Assert.state(StringUtils.isNotEmpty(userId));
 		
-		return sendRequest("grafo/"+videoId);
+		return sendRequest("grafo/"+videoId+"/"+userId);
 	}
 	
 	
