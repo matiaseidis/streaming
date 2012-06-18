@@ -3,6 +3,7 @@ package org.test.streaming;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,14 +49,39 @@ public class DirectCachoStreamer extends CachoStreamer {
 	public void close() throws IOException {
 		log.debug("Downloaded and streamed " + this.getCount() + " bytes.");
 		super.close();
-		FileOutputStream f = new FileOutputStream(this.getCachoFile());
-		this.getBuffer().writeTo(new BufferedOutputStream(f));
-		f.flush();
-		f.close();
-		MovieCachoFile newCacho = new MovieCachoFile(new MovieCacho(0, this.getCachoLength()), this.getCachoFile());
-		this.getIndex().newCachoAvailableLocally(newCacho);	
-		log.debug("[" + 0 + "," + (this.getCount() - 1) + "] -  Downladed, streamed and saved to " + this.getCachoFile());
+		getThreadPool().execute(new Runnable() {
+
+			@Override
+			public void run() {
+				DirectCachoStreamer.this.saveStreamedCacho();
+			}
+		});
+
 		this.getWhatToDo().onCachoComplete(this);
+	}
+
+	protected void saveStreamedCacho() {
+		BufferedOutputStream stream = null;
+		try {
+			stream = new BufferedOutputStream(new FileOutputStream(this.getCachoFile()));
+			this.getBuffer().writeTo(stream);
+			this.getBuffer().flush();
+			MovieCachoFile newCacho = new MovieCachoFile(new MovieCacho(0, this.getCachoLength()), this.getCachoFile());
+			this.getIndex().newCachoAvailableLocally(newCacho);
+			log.debug("[" + 0 + "," + (getCount() - 1) + "] -  Downladed, streamed and saved to " + getCachoFile());
+		} catch (FileNotFoundException e) {
+			log.error("Failed to open cacho file " + getCachoFile() + " when saving it after direct streaming.", e);
+		} catch (IOException e) {
+			log.error("Failed to write cacho file " + getCachoFile() + " when saving it after direct streaming.", e);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					log.warn("Failed to close cacho " + getCachoFile() + " after saving it after direct streaming.", e);
+				}
+			}
+		}
 	}
 
 	public OutputStream getOut() {

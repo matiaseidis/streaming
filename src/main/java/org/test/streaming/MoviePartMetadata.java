@@ -24,13 +24,13 @@ public class MoviePartMetadata {
 		}
 
 		String[] metadataAtts = metadata.split(this.getMetadataSeparator());
-		if (metadataAtts.length != 2) {
+		if (metadataAtts.length < 2) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + " (expected 2 fields, found " + metadataAtts.length + " )");
 		}
 
 		try {
-			int firstByte = Integer.parseInt(metadataAtts[0]);
-			int length = Integer.parseInt(metadataAtts[1]);
+			int firstByte = Integer.parseInt(metadataAtts[metadataAtts.length - 2]);
+			int length = Integer.parseInt(metadataAtts[metadataAtts.length - 1]);
 			this.setCacho(new MovieCacho(firstByte, length));
 		} catch (NumberFormatException e) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + " (expected 2 int filed, found " + metadataAtts[0] + " and " + metadataAtts[1] + " )");
