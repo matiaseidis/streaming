@@ -21,6 +21,38 @@ import com.xuggle.xuggler.IStreamCoder;
  * @author meidis
  *
  */
+
+/**
+ * A rule of thumb to calculate file size from bitrate is: filesize (in MB) = (bitrate in Mbit/s * 8) * (video length in seconds)
+ * 
+ * -i [input file]  - this specifies the name of input file
+ * 
+ * -vcodec libx264 – tells FFmpeg to encode video to H.264 using libx264 library
+ * 
+ * -vprofile high – sets H.264 profile to “High” as per Step 2. Other valid options are baseline, main
+ * 
+ * -preset slow – sets encoding preset for x264 – slower presets give more quality at same bitrate, but need more time to encode. “Slow” is a good balance between encoding time and quality.
+ * 
+ * Other valid options are: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo (never use this one)
+ * 
+ * -b:v - sets video bitrate in bits/s
+ * 
+ * -maxrate and -bufsize – forces libx264 to build video in a way, that it could be streamed over 500kbit/s line considering device buffer of 1000kbits. Very useful for web – setting this to bitrate and 2x bitrate gives good results.
+ * 
+ * -vf scale – applies “scale” filter, which resizes video to desired resolution. “720:480″ would resize video to 720×480, “-1″ means “resize so the aspect ratio is same.”
+ * 
+ * Usually you set only height of the video, so for 380p you set “scale=-1:380″, for 720p “scale=-1:720″ etc.
+ * 
+ * -threads 0 – tells libx264 to choose optimal number of threads to encode, which will make sure all your processor cores in the computer are used
+ * 
+ * -acodec libvo_aacenc – tells FFmpeg to encode video to AAC using libvo_aacenc library
+ * 
+ * -b:a - sets audio bitrate in bits/s
+ * 
+ * -pass [1|2] – tells FFmpeg to process video in multiple passes and sets the current pass
+ * 
+ * -an – disables audio, audio processing has no effect on first pass so it’s best to disable it to not waste CPU
+ */
 public class H264Encoder implements Encoder{
 
 	protected static final Log log = LogFactory
@@ -144,36 +176,3 @@ public class H264Encoder implements Encoder{
 		}
 	}
 }
-
-/*
- * A rule of thumb to calculate file size from bitrate is: filesize (in MB) = (bitrate in Mbit/s * 8) * (video length in seconds)
- */
-/*
- * -i [input file]  - this specifies the name of input file
- * 
--vcodec libx264 – tells FFmpeg to encode video to H.264 using libx264 library
-
--vprofile high – sets H.264 profile to “High” as per Step 2. Other valid options are baseline, main
-
--preset slow – sets encoding preset for x264 – slower presets give more quality at same bitrate, but need more time to encode. “Slow” is a good balance between encoding time and quality.
-
-Other valid options are: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo (never use this one)
-
--b:v - sets video bitrate in bits/s
-
--maxrate and -bufsize – forces libx264 to build video in a way, that it could be streamed over 500kbit/s line considering device buffer of 1000kbits. Very useful for web – setting this to bitrate and 2x bitrate gives good results.
-
--vf scale – applies “scale” filter, which resizes video to desired resolution. “720:480″ would resize video to 720×480, “-1″ means “resize so the aspect ratio is same.”
-
-Usually you set only height of the video, so for 380p you set “scale=-1:380″, for 720p “scale=-1:720″ etc.
-
--threads 0 – tells libx264 to choose optimal number of threads to encode, which will make sure all your processor cores in the computer are used
-
--acodec libvo_aacenc – tells FFmpeg to encode video to AAC using libvo_aacenc library
-
--b:a - sets audio bitrate in bits/s
-
--pass [1|2] – tells FFmpeg to process video in multiple passes and sets the current pass
-
--an – disables audio, audio processing has no effect on first pass so it’s best to disable it to not waste CPU
- */
