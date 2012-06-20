@@ -1,13 +1,16 @@
 package org.test.streaming;
 
+import java.io.File;
+
 public class MoviePartMetadata {
 	private String metadataSeparator = "-";
 	private String partFileExtension = "part";
 	private String extensionSeparator = ".";
 
-	private MovieCacho cacho;
+	private MovieCachoFile cacho;
 
-	public MoviePartMetadata(String movieFileName) {
+	public MoviePartMetadata(File file) {
+		String movieFileName = file.getName();
 		int beginIndex = movieFileName.indexOf(this.getMetadataSeparator()) + 1;
 		if (beginIndex == -1) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + "  (first metadata separator not found)");
@@ -31,19 +34,11 @@ public class MoviePartMetadata {
 		try {
 			int firstByte = Integer.parseInt(metadataAtts[metadataAtts.length - 2]);
 			int length = Integer.parseInt(metadataAtts[metadataAtts.length - 1]);
-			this.setCacho(new MovieCacho(firstByte, length));
+			this.setCacho(new MovieCachoFile(new MovieCacho(firstByte, length), file));
 		} catch (NumberFormatException e) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + " (expected 2 int filed, found " + metadataAtts[0] + " and " + metadataAtts[1] + " )");
 		}
 
-	}
-
-	public MovieCacho getCacho() {
-		return cacho;
-	}
-
-	public void setCacho(MovieCacho cacho) {
-		this.cacho = cacho;
 	}
 
 	public String getMetadataSeparator() {
@@ -68,6 +63,14 @@ public class MoviePartMetadata {
 
 	public void setExtensionSeparator(String extensionSeparator) {
 		this.extensionSeparator = extensionSeparator;
+	}
+
+	public MovieCachoFile getCacho() {
+		return cacho;
+	}
+
+	public void setCacho(MovieCachoFile cacho) {
+		this.cacho = cacho;
 	}
 
 }

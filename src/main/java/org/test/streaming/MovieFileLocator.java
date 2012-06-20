@@ -1,9 +1,10 @@
 package org.test.streaming;
 
-import java.io.File;
+import java.util.List;
+
 
 public interface MovieFileLocator {
 
-	public MovieCachoFile locate(CachoRequest request);
+	public List<MovieCachoFile> locate(CachoRequest request);
 
 }

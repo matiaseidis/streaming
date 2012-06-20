@@ -1,7 +1,7 @@
 package org.test.streaming;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -16,7 +16,7 @@ public class MoviePartMetadataTest {
 		assertThat(moviePartMetadatForFileName("a-0-2.part"), hasMovieCacho(equalTo(make(aCacho().startingFrom(0).withLenght(2)))));
 		assertThat(moviePartMetadatForFileName("b-a-0-2.part"), hasMovieCacho(equalTo(make(aCacho().startingFrom(0).withLenght(2)))));
 		assertThat(moviePartMetadatForFileName("--------b-a-0-2.part"), hasMovieCacho(equalTo(make(aCacho().startingFrom(0).withLenght(2)))));
-		assertThat(moviePartMetadatForFileName("-	0-2.part"), hasMovieCacho(equalTo(make(aCacho().startingFrom(0).withLenght(2)))));
+		assertThat(moviePartMetadatForFileName("-0-2.part"), hasMovieCacho(equalTo(make(aCacho().startingFrom(0).withLenght(2)))));
 	}
 
 	private MoviePartMetadata moviePartMetadatForFileName(String movieFileName) {
@@ -36,7 +36,7 @@ public class MoviePartMetadataTest {
 
 		@Override
 		public boolean matches(Object arg0) {
-			MovieCacho cacho = ((MoviePartMetadata) arg0).getCacho();
+			MovieCacho cacho = ((MoviePartMetadata) arg0).getCacho().getCacho();
 			return this.getCachoMatcher().matches(cacho);
 		}
 

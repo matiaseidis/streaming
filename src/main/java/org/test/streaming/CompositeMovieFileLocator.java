@@ -13,9 +13,9 @@ public class CompositeMovieFileLocator implements MovieFileLocator {
 	}
 
 	@Override
-	public MovieCachoFile locate(CachoRequest request) {
+	public List<MovieCachoFile> locate(CachoRequest request) {
 		for (MovieFileLocator movieFileLocator : this.getLocators()) {
-			MovieCachoFile maybeMovieFile = movieFileLocator.locate(request);
+			List<MovieCachoFile> maybeMovieFile = movieFileLocator.locate(request);
 			if (maybeMovieFile != null) {
 				return maybeMovieFile;
 			}
