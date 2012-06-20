@@ -1,7 +1,9 @@
 package org.test.streaming;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.io.File;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -20,7 +22,7 @@ public class MoviePartMetadataTest {
 	}
 
 	private MoviePartMetadata moviePartMetadatForFileName(String movieFileName) {
-		return new MoviePartMetadata(movieFileName);
+		return new MoviePartMetadata(new File(movieFileName));
 	}
 
 	public MoviePartMetadataCachoMatcher hasMovieCacho(Matcher<MovieCacho> cachoMatcher) {
