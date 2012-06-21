@@ -1,5 +1,6 @@
 package org.test.streaming;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -7,12 +8,12 @@ import java.util.concurrent.Executors;
 public abstract class CachoStreamer extends OutputStream {
 
 	private static ExecutorService threadPool = Executors.newCachedThreadPool();
-	private Index index = new Chasqui();
-	
+	private Index index = new NullIndex();
+	private File sharingDir;
+
 	public abstract void stream();
 
 	public Index getIndex() {
-		
 		return index;
 	}
 
@@ -28,4 +29,11 @@ public abstract class CachoStreamer extends OutputStream {
 		CachoStreamer.threadPool = threadPool;
 	}
 
+	public File getSharingDir() {
+		return this.sharingDir;
+	}
+
+	public void setSharingDir(File sharingDir) {
+		this.sharingDir = sharingDir;
+	}
 }

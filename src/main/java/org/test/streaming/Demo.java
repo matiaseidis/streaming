@@ -1,5 +1,6 @@
 package org.test.streaming;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,7 +46,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 			OutputStream os = response.getOutputStream();
 
-			new DefaultMovieRetrievalPlanInterpreter().interpret(new DummyMovieRetrievalPlan(), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(), os);
+
 			os.flush();
 			os.close();
 		} catch (Exception ex) {
@@ -113,7 +115,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			// is.skip((long) start);
 			// System.out.println("Demo.downloadFile()");
 			// }
-			new DefaultMovieRetrievalPlanInterpreter().interpret(new DummyMovieRetrievalPlan(), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(), os);
 
 			os.flush();
 			os.close();

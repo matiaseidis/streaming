@@ -9,6 +9,10 @@ public class MoviePartMetadata {
 
 	private MovieCachoFile cacho;
 
+	public MoviePartMetadata(File dir, String fileName, int firstByte, int length) {
+		this.setCacho(new MovieCachoFile(new MovieCacho(firstByte, length), new File(dir, fileName + this.getMetadataSeparator() + firstByte + this.getMetadataSeparator() + length + this.getExtensionSeparator() + this.getPartFileExtension())));
+	}
+
 	public MoviePartMetadata(File file) {
 		String movieFileName = file.getName();
 		int beginIndex = movieFileName.indexOf(this.getMetadataSeparator()) + 1;

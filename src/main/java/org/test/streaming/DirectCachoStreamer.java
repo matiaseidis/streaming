@@ -29,7 +29,8 @@ public class DirectCachoStreamer extends CachoStreamer {
 	private OnCachoComplete whatToDo;
 	private int count;
 
-	public DirectCachoStreamer(OutputStream out, int cachoLength, File cachoFile, OnCachoComplete whatToDo) {
+	public DirectCachoStreamer(File shareDir, OutputStream out, int cachoLength, File cachoFile, OnCachoComplete whatToDo) {
+		this.setSharingDir(shareDir);
 		this.setOut(out);
 		this.setCachoLength(cachoLength);
 		this.setBuffer(new ByteArrayOutputStream(this.getCachoLength()));
@@ -62,26 +63,39 @@ public class DirectCachoStreamer extends CachoStreamer {
 
 	protected void saveStreamedCacho() {
 		BufferedOutputStream stream = null;
+		File cachoFile = this.getCachoFile();
 		try {
-			stream = new BufferedOutputStream(new FileOutputStream(this.getCachoFile()));
+			stream = new BufferedOutputStream(new FileOutputStream(cachoFile));
 			this.getBuffer().writeTo(stream);
 			this.getBuffer().flush();
-			MovieCachoFile newCacho = new MovieCachoFile(new MovieCacho(0, this.getCachoLength()), this.getCachoFile());
-			this.getIndex().newCachoAvailableLocally(newCacho);
-			log.debug("[" + 0 + "," + (getCount() - 1) + "] -  Downladed, streamed and saved to " + getCachoFile());
+			stream.flush();
+			log.debug("[" + 0 + "," + (getCount() - 1) + "] -  Downladed, streamed and saved to " + cachoFile);
 		} catch (FileNotFoundException e) {
-			log.error("Failed to open cacho file " + getCachoFile() + " when saving it after direct streaming.", e);
+			log.error("Failed to open cacho file " + cachoFile + " when saving it after direct streaming.", e);
 		} catch (IOException e) {
-			log.error("Failed to write cacho file " + getCachoFile() + " when saving it after direct streaming.", e);
+			log.error("Failed to write cacho file " + cachoFile + " when saving it after direct streaming.", e);
 		} finally {
 			if (stream != null) {
 				try {
 					stream.close();
+					this.cachoDownloaded();
 				} catch (IOException e) {
-					log.warn("Failed to close cacho " + getCachoFile() + " after saving it after direct streaming.", e);
+					log.warn("Failed to close cacho " + cachoFile + " after saving it after direct streaming.", e);
 				}
 			}
 		}
+	}
+
+	private void cachoDownloaded() {
+		if (!this.getCachoFile().renameTo(this.sharedCachoFile())) {
+			log.warn("Failed to move cacho file " + this.getCachoFile() + " to share dir: " + sharedCachoFile());
+		}
+		MovieCachoFile newCacho = new MovieCachoFile(new MovieCacho(0, this.getCachoLength()), sharedCachoFile());
+		this.getIndex().newCachoAvailableLocally(newCacho);
+	}
+
+	private File sharedCachoFile() {
+		return new File(this.getSharingDir(), this.getCachoFile().getName());
 	}
 
 	public OutputStream getOut() {

@@ -11,6 +11,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanInterpreter {
 	protected static final Log log = LogFactory.getLog(DefaultMovieRetrievalPlanInterpreter.class);
+	private File tempDir;
+	private File shareDir;
+
+	public DefaultMovieRetrievalPlanInterpreter(File shareDir, File tempDir) {
+		this.setShareDir(shareDir);
+		this.setTempDir(tempDir);
+	}
 
 	@Override
 	public void interpret(MovieRetrievalPlan plan, OutputStream out) {
@@ -21,7 +28,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 		CachoRetrieval firstCacho = requests.get(0);
 		final CachoRequester cachoRequester = new CachoRequester(firstCacho.getHost(), firstCacho.getPort());
 		final CachoRequest request = firstCacho.getRequest();
-		final DirectCachoStreamer firstStreamer = new DirectCachoStreamer(out, request.getLength(), createPartFile(request), new OnCachoComplete() {
+		final DirectCachoStreamer firstStreamer = new DirectCachoStreamer(this.getShareDir(), out, request.getLength(), createPartFile(request), new OnCachoComplete() {
 
 			@Override
 			public void onCachoComplete(CachoStreamer streamer) {
@@ -37,7 +44,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 		};
 		tasks.add(runnable);
 		for (final CachoRetrieval a : requests.subList(1, requests.size())) {
-			final BackgroundCachoStreamer cachoStreamer = new BackgroundCachoStreamer(createPartFile(a.getRequest()), out, a.getRequest().getFirstByteIndex(), a.getRequest().getLength(), new OnCachoComplete() {
+			final BackgroundCachoStreamer cachoStreamer = new BackgroundCachoStreamer(this.getShareDir(), createPartFile(a.getRequest()), out, a.getRequest().getFirstByteIndex(), a.getRequest().getLength(), new OnCachoComplete() {
 
 				@Override
 				public void onCachoComplete(CachoStreamer streamer) {
@@ -89,7 +96,23 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 	}
 
 	private File createPartFile(CachoRequest request) {
-		return new File(request.getFileName() + "-" + request.getFirstByteIndex() + "-" + request.getLength() + ".part");
+		return new MoviePartMetadata(this.getTempDir(), request.getFileName(), request.getFirstByteIndex(), request.getLength()).getCacho().getMovieFile();
+	}
+
+	public File getTempDir() {
+		return tempDir;
+	}
+
+	public void setTempDir(File tempDir) {
+		this.tempDir = tempDir;
+	}
+
+	public File getShareDir() {
+		return shareDir;
+	}
+
+	public void setShareDir(File shareDir) {
+		this.shareDir = shareDir;
 	}
 
 }
