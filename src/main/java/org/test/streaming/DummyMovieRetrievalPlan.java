@@ -4,6 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
+    
+    private final String videoId;
+    
+    public DummyMovieRetrievalPlan(String videoId){
+        super();
+        this.videoId = videoId;
+    }
 
 	@Override
 	public List<CachoRetrieval> getRequests() {
@@ -23,4 +30,11 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		requests.add(new CachoRetrieval(Conf.DIMON_HOST, Conf.DIMON_PORT, new CachoRequest(null, movieFileName, totalRequested, totalSize - totalRequested)));
 		return requests;
 	}
+
+	@Override
+	public String getVideoId() {
+		return videoId;
+	}
+
+
 }

@@ -23,7 +23,7 @@ public class CachoRequester {
 
 	public static void main(String[] args) throws IOException {
 		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
-		new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(), baos);
+		new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(Conf.VIDEO), baos);
 		// 421732944
 		// 5570947
 		baos.flush();

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,14 +16,22 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	// private static final double KbitsPerSec = MegabitsPerSec * 1000;
 
 	private static int bufferSize = 256 * 256;
+	private String videoParam = "id";
 
 	private static final long serialVersionUID = 1L;
 	private final static String contentTypeMP4 = "video/mp4";
 	byte[] headerMP4 = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x14, (byte) 0x66, (byte) 0x74, (byte) 0x79, (byte) 0x70, (byte) 0x69, (byte) 0x73, (byte) 0x6F, (byte) 0x6D };
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		
+		String videoId = request.getParameter(videoParam);
+		if(videoId == null) {
+			videoId = Conf.VIDEO;
+		}
+		request.getSession().getServletContext().setAttribute(videoParam, videoId);
+		
 		try {
-			downloadFile(response);
+			downloadFile(response, videoId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -34,19 +41,19 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		doGet(req, resp);
 	}
 
-	public void downloadFile(HttpServletResponse response) throws Exception {
+	public void downloadFile(HttpServletResponse response, String videoId) throws Exception {
 
 		try {
 			response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
 			response.setContentLength(Conf.VIDEO_SIZE);
-			response.addHeader("Content-disposition", "attachment;filename=" + Conf.VIDEO);
+			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
 
 			response.flushBuffer();
 
 			OutputStream os = response.getOutputStream();
 
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId), os);
 
 			os.flush();
 			os.close();
@@ -115,7 +122,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			// is.skip((long) start);
 			// System.out.println("Demo.downloadFile()");
 			// }
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan("esto no se usa mas"), os);
 
 			os.flush();
 			os.close();
