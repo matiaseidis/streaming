@@ -1,6 +1,18 @@
 package org.test.streaming;
 
+import java.util.Properties;
+
 public class Conf {
+	
+	private static Properties properties;
+
+	public static void setProperties(Properties properties){
+		Conf.properties = properties;
+	}
+	
+	public static String get(String propertyKey){
+		return properties.getProperty(propertyKey);
+	}
 
 	// public static final String VIDEO_DIR = "/home/matias/cachos/files/";
 	// public static final String VIDEO_DIR = "/home/meidis/Videos/";
