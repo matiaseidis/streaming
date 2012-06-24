@@ -22,10 +22,9 @@ import com.google.gson.Gson;
 public class Notifier {
 	
 	private static final String URL_BASE = Conf.getNotifierUrl();
-	private static final Notifier INSTANCE = new Notifier(); 
 	public Logger logger = Logger.getLogger(getClass());
 
-	private Notifier(){
+	public Notifier(){
 		System.out.println("Notifier.Notifier()");
 	}
 	
@@ -95,14 +94,6 @@ public class Notifier {
 		return sb.toString();
 	}
 
-
-
-	public static Notifier getInstance() {
-		return INSTANCE;
-	}
-
-
-
 	public String registerParts(String fileName, String chunks) {
 		Assert.state(StringUtils.isNotEmpty(fileName));
 		Assert.state(StringUtils.isNotEmpty(chunks));
@@ -110,8 +101,6 @@ public class Notifier {
 		return sendRequest("video/registerChunks/"+fileNameFromPart(fileName)+"/"+Conf.get("test.user.id")+"/"+chunks);	
 		
 	}
-
-
 
 	private String fileNameFromPart(String fileName) {
 		// Luther.S02E01.720p.HDTV.x264-3.mp4-67108864-67108864.part

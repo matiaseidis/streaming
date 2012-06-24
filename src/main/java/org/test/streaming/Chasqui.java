@@ -19,21 +19,21 @@ import org.test.streaming.monitor.Notifier;
 public class Chasqui implements Index {
 
 	protected static final Log log = LogFactory.getLog(Chasqui.class);
-	private static final int INDEXABLE_SIZE = 1024 * 1024;
-	private Notifier notifier = Notifier.getInstance();
+	private int indexableSize = 1024 * 1024;
+	private Notifier notifier = new Notifier();
 	
 	@Override
 	public void newCachoAvailableLocally(MovieCachoFile movieCachoFile) {
 		
-		if(movieCachoFile.getCacho().getLength() / INDEXABLE_SIZE == 0){
-			log.info("No se indexan cachos mas chicos que " +INDEXABLE_SIZE+" bytes");
+		if(movieCachoFile.getCacho().getLength() / indexableSize == 0){
+			log.info("No se indexan cachos mas chicos que " +indexableSize+" bytes");
 			return;
 		}
 		
 		int cachoFrom = movieCachoFile.getCacho().getFirstByteIndex();
 		int cachoLenght = movieCachoFile.getCacho().getLength();
-		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
-		int totalPedazos = (cachoLenght - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
+		int nextPedazoFrom = cachoFrom % indexableSize == 0 ? cachoFrom : cachoFrom + indexableSize;
+		int totalPedazos = (cachoLenght - (nextPedazoFrom - cachoFrom)) / indexableSize;
 		String fileName = movieCachoFile.getMovieFile().getName();
 		
 		/*
@@ -55,9 +55,9 @@ public class Chasqui implements Index {
 		for(int i = 0; i < totalPedazos; i++){
 			
 			String chunkId = generateId(movieCachoFile.getMovieFile(), nextPedazoFrom, movieCachoFile.getCacho().getFirstByteIndex(), false);
-			int ordinal = nextPedazoFrom/INDEXABLE_SIZE; // base 0 ???
+			int ordinal = nextPedazoFrom/indexableSize; // base 0 ???
 			pedazos.put(ordinal, chunkId);
-			nextPedazoFrom += INDEXABLE_SIZE;
+			nextPedazoFrom += indexableSize;
 		}
 		
 		StringBuilder sb = new StringBuilder();
@@ -70,7 +70,7 @@ public class Chasqui implements Index {
 		
 		String chunks = sb.toString();
 		notifier.registerParts(fileName, chunks);
-		log.info("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]> - "+totalPedazos+" fragmentos de "+INDEXABLE_SIZE+" reportados");
+		log.info("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]> - "+totalPedazos+" fragmentos de "+indexableSize+" reportados");
 	}
 	
 	private String generateId(File file, int chunkFrom, int cachoFrom, boolean fullVideoId) {
@@ -123,9 +123,9 @@ public class Chasqui implements Index {
 		String hash = this.generateId(file, 0, 0, true);
 		
 		int cachoFrom = 0;
-		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
+		int nextPedazoFrom = cachoFrom % indexableSize == 0 ? cachoFrom : cachoFrom + indexableSize;
 		int videoFileSize = Integer.parseInt(Conf.get("test.video.file.size"));
-		int totalPedazos = (videoFileSize - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
+		int totalPedazos = (videoFileSize - (nextPedazoFrom - cachoFrom)) / indexableSize;
 		
 		/*
 		 * partes de 1mb en la que indexo este cacho
@@ -137,7 +137,7 @@ public class Chasqui implements Index {
 			String chunkId = generateId(file, nextPedazoFrom, 0, false);
 			log.info("oridinal: " + i + "id: "+ chunkId);
 			sb.append(chunkId+"!");
-			nextPedazoFrom += INDEXABLE_SIZE;
+			nextPedazoFrom += indexableSize;
 		}
 		
 		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
