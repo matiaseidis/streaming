@@ -45,7 +45,7 @@ public class Chasqui implements Index {
 		/*
 		 * TODO FIXME aca tengo que tener el id porque estoy descargandome el video (param) ...
 		 */
-		String videoId = Conf.VIDEO_ID_FOR_TESTING; 
+		String videoId = Conf.get("test.video.file.id"); 
 		
 		/*
 		 * TODO cachear esto?
@@ -118,12 +118,14 @@ public class Chasqui implements Index {
 
 
 	private void registerVideo() {
-		File file = new File(Conf.VIDEO_DIR+Conf.VIDEO);
+		String videoFileName = Conf.get("test.video.file.name");
+		File file = new File(Conf.getCachosDir()+videoFileName);
 		String hash = this.generateId(file, 0, 0, true);
 		
 		int cachoFrom = 0;
 		int nextPedazoFrom = cachoFrom % INDEXABLE_SIZE == 0 ? cachoFrom : cachoFrom + INDEXABLE_SIZE;
-		int totalPedazos = (Conf.VIDEO_SIZE - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
+		int videoFileSize = Integer.parseInt(Conf.get("test.video.file.size"));
+		int totalPedazos = (videoFileSize - (nextPedazoFrom - cachoFrom)) / INDEXABLE_SIZE;
 		
 		/*
 		 * partes de 1mb en la que indexo este cacho
@@ -140,8 +142,8 @@ public class Chasqui implements Index {
 		
 		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
 		
-		notifier.registerVideo(hash, Conf.VIDEO, Conf.VIDEO_SIZE, sb.toString());
-		log.info("Hashed full video: "+hash+" - "+Conf.VIDEO+" - "+ Conf.VIDEO_SIZE+" - "+ sb.toString());
+		notifier.registerVideo(hash, videoFileName, videoFileSize, sb.toString());
+		log.info("Hashed full video: "+hash+" - "+videoFileName+" - "+ videoFileSize +" - "+ sb.toString());
 		
 	}
 

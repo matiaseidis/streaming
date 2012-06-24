@@ -11,7 +11,7 @@ public class BaseModel {
 	
 public Logger logger = Logger.getLogger(getClass());
 	
-	private String prevalenceDirectory = Conf.PREVALENCE_DIR;
+	private String prevalenceDirectory = "Conf.PREVALENCE_DIR";
 	private Prevayler prevayler;
 	private final PrevaylerFactory prevaylerFactory;
 	

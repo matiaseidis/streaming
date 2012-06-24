@@ -26,7 +26,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		
 		String videoId = request.getParameter(videoParam);
 		if(videoId == null) {
-			videoId = Conf.VIDEO;
+			videoId = Conf.get("test.video.file.name");
 		}
 		request.getSession().getServletContext().setAttribute(videoParam, videoId);
 		
@@ -46,7 +46,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		try {
 			response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
-			response.setContentLength(Conf.VIDEO_SIZE);
+			int videoSize = Integer.parseInt(Conf.get("test.video.file.size"));
+			response.setContentLength(videoSize);
 			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
 
 			response.flushBuffer();
@@ -104,7 +105,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 			response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
-			response.setContentLength(Conf.VIDEO_SIZE);
+			int videoSize = Integer.parseInt(Conf.get("test.video.file.size"));
+			response.setContentLength(videoSize);
 			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("videoDemo", "UTF-8"));
 
 			response.flushBuffer();

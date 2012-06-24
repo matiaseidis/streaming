@@ -18,7 +18,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 public class CachoServerHandler extends SimpleChannelHandler {
 	protected static final Log log = LogFactory.getLog(CachoServerHandler.class);
 
-	private static final String LIBRARY_DIR_PATH = Conf.VIDEO_DIR;
+	private static final String LIBRARY_DIR_PATH = Conf.getCachosDir();
 	private MovieFileLocator movieFileLocator = new CompositeMovieFileLocator(new CompleteMovieFileLocator(LIBRARY_DIR_PATH), new CachoMovieFileLocator(LIBRARY_DIR_PATH));
 
 	private static final double MegabitsPerSec = 100;
