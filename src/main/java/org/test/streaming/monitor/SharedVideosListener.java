@@ -12,7 +12,6 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
-import org.test.streaming.Hasher;
 import org.test.streaming.prevalence.BaseModel;
 
 public class SharedVideosListener 
@@ -34,7 +33,7 @@ extends FileAlterationListenerAdaptor {
 	private FileAlterationObserver observer;
 	private FileAlterationMonitor monitor;
 
-	public SharedVideosListener(BaseModel baseModel, Conf conf){
+	public SharedVideosListener(/*BaseModel baseModel, */Conf conf){
 
 		//		this.baseModel = baseModel;
 		observer = new FileAlterationObserver(monitoredDir);
@@ -52,8 +51,15 @@ extends FileAlterationListenerAdaptor {
 		observer.addListener(this);
 		monitor.addObserver(observer);
 		monitor.start();
-
 		log.debug("SharedVideosListener.begin()");
+	}
+	
+	public void end(){
+		try {
+			monitor.stop();
+		} catch(Exception e) {
+			log.error("Unable to stop the monitor", e);
+		}
 	}
 
 	@Override

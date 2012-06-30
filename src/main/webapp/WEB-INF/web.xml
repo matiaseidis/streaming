@@ -18,6 +18,10 @@
 <!--         <filter-name>cross-origin</filter-name> -->
 <!--         <url-pattern>/</url-pattern> -->
 <!--     </filter-mapping> -->
+<listener>
+<listener-class>org.test.streaming.listener.SharedVideosMonitor</listener-class>
+</listener>
+
 	<servlet>
 		<servlet-name>s</servlet-name>
 		<servlet-class>org.test.streaming.Demo</servlet-class>
