@@ -18,14 +18,21 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 public class CachoServerHandler extends SimpleChannelHandler {
 	protected static final Log log = LogFactory.getLog(CachoServerHandler.class);
 
-	private static final String LIBRARY_DIR_PATH = Conf.getCachosDir();
-	private MovieFileLocator movieFileLocator = new CompositeMovieFileLocator(new CompleteMovieFileLocator(LIBRARY_DIR_PATH), new CachoMovieFileLocator(LIBRARY_DIR_PATH));
+	private final String libraryDirPath;
+	private MovieFileLocator movieFileLocator;
 
 	private static final double MegabitsPerSec = 100;
 	private static final double KbitsPerSec = MegabitsPerSec * 1000;
 	double BytesPerSec = KbitsPerSec * 1000 / 8;
 	double BytesPerMili = BytesPerSec / 1000;
 	double transferCostFactor = 2;
+	private Conf conf;
+	
+	public CachoServerHandler(Conf conf){
+		this.conf = conf;
+		libraryDirPath = conf.getCachosDir();
+		movieFileLocator = new CompositeMovieFileLocator(new CompleteMovieFileLocator(libraryDirPath), new CachoMovieFileLocator(libraryDirPath));
+	}
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {

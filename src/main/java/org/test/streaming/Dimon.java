@@ -14,9 +14,11 @@ import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 public class Dimon extends SimpleChannelUpstreamHandler {
 
 	private final int port;
+	private Conf conf; 
 
 	public Dimon(int port) {
 		this.port = port;
+		this.conf = new Conf();
 	}
 
 	public void run() {
@@ -26,7 +28,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 		// Set up the pipeline factory.
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new ObjectDecoder(), new CachoServerHandler());
+				return Channels.pipeline(new ObjectDecoder(), new CachoServerHandler(conf));
 			}
 		});
 		bootstrap.setOption("child.tcpNoDelay", true);

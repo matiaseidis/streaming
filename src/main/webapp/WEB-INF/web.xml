@@ -18,23 +18,11 @@
 <!--         <filter-name>cross-origin</filter-name> -->
 <!--         <url-pattern>/</url-pattern> -->
 <!--     </filter-mapping> -->
-
-<listener>
-<listener-class>org.test.streaming.listener.PropertiesLoader</listener-class>
-</listener>
-
 	<servlet>
 		<servlet-name>s</servlet-name>
 		<servlet-class>org.test.streaming.Demo</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>u</servlet-name>
-		<servlet-class>org.test.streaming.Upload</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>u</servlet-name>
-		<url-pattern>/upload/*</url-pattern>
-	</servlet-mapping>
+
 	<servlet-mapping>
 		<servlet-name>s</servlet-name>
 		<url-pattern>/stream/*</url-pattern>

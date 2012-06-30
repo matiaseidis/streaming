@@ -21,10 +21,13 @@ import com.google.gson.Gson;
 
 public class Notifier {
 	
-	private static final String URL_BASE = Conf.getNotifierUrl();
+	private final String urlBase;
 	public Logger logger = Logger.getLogger(getClass());
-
-	public Notifier(){
+	private Conf conf;
+	
+	public Notifier(Conf conf){
+		this.conf = conf;
+		urlBase = conf.getNotifierUrl();
 		System.out.println("Notifier.Notifier()");
 	}
 	
@@ -34,7 +37,7 @@ public class Notifier {
 		
 		Assert.state(StringUtils.isNotEmpty(videoId));
 
-		String response = sendRequest("video/getChunks/"+videoId+"/"+Conf.get("test.user.id"));
+		String response = sendRequest("video/getChunks/"+videoId+"/"+conf.get("test.user.id"));
 		
 		Gson gson = new Gson();
 		List<String> chunkIds = gson.fromJson(response, List.class);
@@ -73,7 +76,7 @@ public class Notifier {
 		URI uri = null;
 		URL url = null;
 		try {
-			uri = new URI(URL_BASE+urlSuffix);
+			uri = new URI(urlBase+urlSuffix);
 			url = uri.toURL();
 			URLConnection urlConnection = url.openConnection();
 			BufferedReader in = new BufferedReader(
@@ -98,7 +101,7 @@ public class Notifier {
 		Assert.state(StringUtils.isNotEmpty(fileName));
 		Assert.state(StringUtils.isNotEmpty(chunks));
 		
-		return sendRequest("video/registerChunks/"+fileNameFromPart(fileName)+"/"+Conf.get("test.user.id")+"/"+chunks);	
+		return sendRequest("video/registerChunks/"+fileNameFromPart(fileName)+"/"+conf.get("test.user.id")+"/"+chunks);	
 		
 	}
 
@@ -130,7 +133,7 @@ public class Notifier {
 		    System.out.println(data);
 		    
 		    // Send data
-		    URL url = new URL(Conf.getNotifierUrl()+"video/register/"+videoId+"/"+fileName+"/"+lenght+"/"+Conf.get("test.user.id"));
+		    URL url = new URL(conf.getNotifierUrl()+"video/register/"+videoId+"/"+fileName+"/"+lenght+"/"+conf.get("test.user.id"));
 		    System.out.println(url.toString());
 		    System.out.println(url.toURI());
 		    

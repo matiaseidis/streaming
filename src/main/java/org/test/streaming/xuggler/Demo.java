@@ -23,7 +23,6 @@ package org.test.streaming.xuggler;
 import org.test.streaming.Conf;
 
 import com.xuggle.mediatool.IMediaReader;
-import com.xuggle.mediatool.IMediaViewer.Mode;
 import com.xuggle.mediatool.ToolFactory;
 
 /**
@@ -38,7 +37,8 @@ public class Demo {
 	
 	public static void main(String[] args) {
 		// create a media reader
-		IMediaReader reader = ToolFactory.makeReader(Conf.getSharedDir()/**/);
+		Conf conf = new Conf();
+		IMediaReader reader = ToolFactory.makeReader(conf.getSharedDir()/**/);
 		
 		// add a viewer to the reader, to see the decoded media
 		reader.addListener(ToolFactory.makeWriter("output.mp4", reader));
