@@ -38,7 +38,7 @@ public class Demo {
 	
 	public static void main(String[] args) {
 		// create a media reader
-		IMediaReader reader = ToolFactory.makeReader(Conf.VIDEO_DIR+Conf.VIDEO);
+		IMediaReader reader = ToolFactory.makeReader(Conf.getSharedDir()/**/);
 		
 		// add a viewer to the reader, to see the decoded media
 		reader.addListener(ToolFactory.makeWriter("output.mp4", reader));
