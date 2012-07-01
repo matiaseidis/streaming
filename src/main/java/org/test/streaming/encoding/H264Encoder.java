@@ -53,7 +53,7 @@ public class H264Encoder implements Encoder{
 	}
 
 	@Override
-	public void encode() {
+	public File encode() {
 
 		String inFile = originDir+fileName;
 		String[] splittedFileName = fileName.split("\\.");
@@ -81,21 +81,24 @@ public class H264Encoder implements Encoder{
 		log.info(firstPass);
 		log.info(secondPass);
 		log.info(thirdPass);
-
+		File encodedFile = new File(outFile);
 		try {
 			launchEncoding(firstPass);
 			log.debug("About to delete buffer: "+buffer);
 			new File(buffer).delete();
 			launchEncoding(secondPass);
 			launchEncoding(thirdPass);
-
-			if(!new File(tempFile).renameTo(new File(outFile))) {
-				log.error("unable to move encoded file " + tempFile +" to target file "+outFile);
+			
+			if(!new File(tempFile).renameTo(encodedFile)) {
+				String message = "unable to move encoded file " + tempFile +" to target file "+outFile;
+				log.error(message);
+				throw new IllegalStateException(message);
 			}
 			this.removeDirectory(new File(tempDir));
 		} catch(IOException e){
 			log.error(e);
 		}
+		return encodedFile;
 	}
 
 	private void scanFile(String inFile, int videoBitRate, int audioBitRate, int videoHeight) {

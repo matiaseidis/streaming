@@ -15,6 +15,7 @@ public class Conf {
 	protected static final Log log = LogFactory.getLog(Conf.class);
 	private String confPath = "/conf.properties";
 	
+	private String baseDir = "video.dir.base";
 	private String tempDir = "video.dir.temp";
 	private String cachosDir = "video.dir.cachos";
 	private String sharedDir = "video.dir.compartido";
@@ -38,21 +39,30 @@ public class Conf {
 			}
 	        this.properties = props;
 	        
-	        new File(this.getCachosDir()).mkdirs();
-	        new File(this.getSharedDir()).mkdirs();
-	        new File(this.getTempDir()).mkdirs();
+	        createDirOrShutDown(new File(this.getCachosDir()));
+	        createDirOrShutDown(new File(this.getSharedDir()));
+	        createDirOrShutDown(new File(this.getTempDir()));
 	}
 	
+	private void createDirOrShutDown(File dir) {
+		if(!dir.exists()) {
+        	if(!dir.mkdirs()) {
+        		log.fatal("Unable to create directory "+dir.getAbsolutePath()+" - context shutdown.");
+        		System.exit(1);
+        	}
+        }
+	}
+
 	public String getTempDir() {
-		return get(tempDir);
+		return getAppDir(get(tempDir));
 	}
 
 	public String getCachosDir() {
-		return get(cachosDir);
+		return getAppDir(get(cachosDir));
 	}
 
 	public String getSharedDir() {
-		return get(sharedDir);
+		return getAppDir(get(sharedDir));
 	}
 
 	public String getNotifierUrl() {
@@ -82,4 +92,18 @@ public class Conf {
 	public int getIndexableSize() {
 		return 1024*1024;
 	}
+
+	public String getBaseDir() {
+		return get(baseDir);
+	}
+
+	private String getAppDir(String dir) {
+		return System.getProperty("user.home") + 
+				File.separatorChar+ 
+				getBaseDir()+
+				File.separatorChar+
+				dir+
+				File.separatorChar;
+	}
+	
 }

@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.lang.StringUtils;
-
 public class LocalTracking implements Serializable {
 	
 	private final ConcurrentMap<String, Video> videosRepo = new ConcurrentHashMap<String, Video>();

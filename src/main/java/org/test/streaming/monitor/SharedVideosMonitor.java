@@ -12,12 +12,12 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
-import org.test.streaming.prevalence.BaseModel;
+import org.test.streaming.encoding.H264Encoder;
 
-public class SharedVideosListener 
+public class SharedVideosMonitor 
 extends FileAlterationListenerAdaptor {
 
-	protected static final Log log = LogFactory.getLog(SharedVideosListener.class);
+	protected static final Log log = LogFactory.getLog(SharedVideosMonitor.class);
 
 	//	private BaseModel baseModel;
 
@@ -33,9 +33,11 @@ extends FileAlterationListenerAdaptor {
 	private FileAlterationObserver observer;
 	private FileAlterationMonitor monitor;
 
-	public SharedVideosListener(/*BaseModel baseModel, */Conf conf){
+	public SharedVideosMonitor(/*BaseModel baseModel, */Conf conf){
 
 		//		this.baseModel = baseModel;
+		monitoredDir = conf.getSharedDir();
+		monitorInterval = conf.getMonitorInterval();
 		observer = new FileAlterationObserver(monitoredDir);
 		monitor = new FileAlterationMonitor(monitorInterval);
 		this.conf = conf;
@@ -68,9 +70,9 @@ extends FileAlterationListenerAdaptor {
 		/*
 		 * por ahora, solo soporte para mp4 y parts
 		 */
-		if ( !newFile.getName().endsWith(".mp4")/* && !newFile.getName().endsWith(".part")*/){
-			return;
-		}
+//		if ( !newFile.getName().endsWith(".mp4")/* && !newFile.getName().endsWith(".part")*/){
+//			return;
+//		}
 
 		checkCompletness(newFile);
 
@@ -89,7 +91,10 @@ extends FileAlterationListenerAdaptor {
 					}
 					file= dest;
 				}
-				return new VideoRegistration(file, conf).go();
+				H264Encoder encoder = new H264Encoder(file.getName(), conf.getSharedDir(), conf.getCachosDir());
+				File readyToShareVideo = encoder.encode();
+				
+				return new VideoRegistration(readyToShareVideo, conf).go();
 			}
 		});
 	}

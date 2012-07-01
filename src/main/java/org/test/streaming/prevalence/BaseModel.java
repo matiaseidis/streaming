@@ -5,7 +5,6 @@ import org.prevayler.Prevayler;
 import org.prevayler.PrevaylerFactory;
 import org.prevayler.foundation.monitor.SimpleMonitor;
 import org.prevayler.foundation.serialization.XStreamSerializer;
-import org.test.streaming.Conf;
 
 public class BaseModel {
 	

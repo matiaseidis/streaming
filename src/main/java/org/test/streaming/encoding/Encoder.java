@@ -1,5 +1,7 @@
 package org.test.streaming.encoding;
 
+import java.io.File;
+
 /**
  * 
  * @author meidis
@@ -8,5 +10,5 @@ package org.test.streaming.encoding;
 public interface Encoder {
 
 	
-	public void encode();
+	public File encode();
 }

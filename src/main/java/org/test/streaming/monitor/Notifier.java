@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.util.Assert;
 import org.test.streaming.Conf;
 
 import com.google.gson.Gson;
@@ -35,7 +34,7 @@ public class Notifier {
 	
 	public List<String> listChunks(String videoId){
 		
-		Assert.state(StringUtils.isNotEmpty(videoId));
+//		Assert.state(StringUtils.isNotEmpty(videoId));
 
 		String response = sendRequest("video/getChunks/"+videoId+"/"+conf.get("test.user.id"));
 		
@@ -56,15 +55,15 @@ public class Notifier {
 
 	public String listVideos(String videoId){
 		
-		Assert.state(StringUtils.isNotEmpty(videoId));
+//		Assert.state(StringUtils.isNotEmpty(videoId));
 		
 		return sendRequest("video/list");	
 	}
 
 	public String getGrafo(String videoId, String userId){
 		
-		Assert.state(StringUtils.isNotEmpty(videoId));
-		Assert.state(StringUtils.isNotEmpty(userId));
+//		Assert.state(StringUtils.isNotEmpty(videoId));
+//		Assert.state(StringUtils.isNotEmpty(userId));
 		
 		return sendRequest("grafo/"+videoId+"/"+userId);
 	}
@@ -98,8 +97,8 @@ public class Notifier {
 	}
 
 	public String registerParts(String fileName, String chunks) {
-		Assert.state(StringUtils.isNotEmpty(fileName));
-		Assert.state(StringUtils.isNotEmpty(chunks));
+//		Assert.state(StringUtils.isNotEmpty(fileName));
+//		Assert.state(StringUtils.isNotEmpty(chunks));
 		
 		return sendRequest("video/registerChunks/"+fileNameFromPart(fileName)+"/"+conf.get("test.user.id")+"/"+chunks);	
 		
@@ -121,9 +120,9 @@ public class Notifier {
 
 
 	public String registerVideo(String videoId, String fileName, long lenght, String chunks) {
-		Assert.state(StringUtils.isNotEmpty(fileName));
-		Assert.state(StringUtils.isNotEmpty(videoId));
-		Assert.state(StringUtils.isNotEmpty(chunks));
+//		Assert.state(StringUtils.isNotEmpty(fileName));
+//		Assert.state(StringUtils.isNotEmpty(videoId));
+//		Assert.state(StringUtils.isNotEmpty(chunks));
 		//register/{videoId}/{fileName}/{lenght}/{chunks}/{userId}", method = RequestMethod.POST)
 		String line= null;
 		try {
