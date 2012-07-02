@@ -22,6 +22,8 @@ public class H264Encoder implements Encoder{
 	protected static final Log log = LogFactory
 			.getLog(H264Encoder.class);
 
+	
+	
 	private final String originDir;
 	private String tempDir;
 	private final String targetDir;
@@ -34,6 +36,10 @@ public class H264Encoder implements Encoder{
 	private int fixedVideoBitRate = 875;
 	private String audioCodec = "libfaac"; 
 	private String fileName;
+	
+	int videoBitRate; 
+	int videoHeight; 
+	int audioBitRate; 
 
 	public H264Encoder(String file, String originDir, String targetDir){
 		this.fileName = file;
@@ -60,11 +66,9 @@ public class H264Encoder implements Encoder{
 		String extension  = splittedFileName[splittedFileName.length-1];
 		String tempFile = tempDir+fileName.replace(extension, tempExtension)+"."+targetExtension;
 		String outFile = targetDir+fileName.replace(extension, targetExtension);
-		int videoBitRate = 0; 
-		int videoHeight = 0; 
-		int audioBitRate = 0; 
 
-		scanFile(inFile, videoBitRate, audioBitRate, videoHeight);
+
+		scanFile(inFile);
 
 		log.info("inFile: "+inFile);
 		log.info("buffer: "+buffer);
@@ -83,6 +87,7 @@ public class H264Encoder implements Encoder{
 		log.info(thirdPass);
 		File encodedFile = new File(outFile);
 		try {
+			new File(tempDir).mkdirs();
 			launchEncoding(firstPass);
 			log.debug("About to delete buffer: "+buffer);
 			new File(buffer).delete();
@@ -94,6 +99,7 @@ public class H264Encoder implements Encoder{
 				log.error(message);
 				throw new IllegalStateException(message);
 			}
+//			encodedFile.createNewFile();
 			this.removeDirectory(new File(tempDir));
 		} catch(IOException e){
 			log.error(e);
@@ -101,7 +107,7 @@ public class H264Encoder implements Encoder{
 		return encodedFile;
 	}
 
-	private void scanFile(String inFile, int videoBitRate, int audioBitRate, int videoHeight) {
+	private void scanFile(String inFile) {
 
 		// Create a Xuggler container object
 		IContainer container = IContainer.make();
@@ -129,6 +135,7 @@ public class H264Encoder implements Encoder{
 				videoHeight = coder.getHeight();
 			}
 		}
+		container.close();
 	}
 
 	private int fixedVideoBitRate(int i) {

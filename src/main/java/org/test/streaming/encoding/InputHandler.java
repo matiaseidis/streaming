@@ -21,7 +21,10 @@ public class InputHandler extends Thread {
 		try {
 			int c;
 			while ((c = input_.read()) != -1) {
-				log.debug(c);
+				/*
+				 * TODO logger sin carriage return para procesos de ffmpeg
+				 */
+				System.out.print((char)c);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();

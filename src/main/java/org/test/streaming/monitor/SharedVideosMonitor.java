@@ -74,6 +74,10 @@ extends FileAlterationListenerAdaptor {
 //			return;
 //		}
 
+		if(newFile.getAbsolutePath().contains("_TEMP_ENCODING_")){
+			return;
+		}
+		
 		checkCompletness(newFile);
 
 		pool.submit(new Callable<String>(){
