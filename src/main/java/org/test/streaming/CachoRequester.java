@@ -21,16 +21,6 @@ public class CachoRequester {
 	private final String host;
 	private final int port;
 
-	public static void main(String[] args) throws IOException {
-		Conf conf = new Conf();
-		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
-		new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos);
-		// 421732944
-		// 5570947
-		baos.flush();
-		baos.close();
-
-	}
 
 	public CachoRequester(String host, int port) {
 		this.host = host;

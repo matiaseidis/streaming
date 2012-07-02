@@ -3,6 +3,7 @@ package org.test.streaming.encoding;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,90 +11,103 @@ import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
+
 /**
  * 
  * @author meidis
- *
+ * 
  */
-public class H264Encoder implements Encoder{
+public class H264Encoder implements Encoder {
 
-	protected static final Log log = LogFactory
-			.getLog(H264Encoder.class);
-	
-	private final String originDir;
-	private String tempDir;
-	private final String targetDir;
+	protected static final Log log = LogFactory.getLog(H264Encoder.class);
+
+	private File originDir;
+	private File tempDir;
+	private File targetDir;
 	private String targetExtension = "mp4";
 	private String tempExtension = "temp";
-	private String buffer;
+	private File buffer;
 	private int fixedVideoBitRate = 875;
-	private String audioCodec = "libfaac"; 
+	private String audioCodec = "libfaac";
 	private String fileName;
-	private int videoBitRate; 
-	private int videoHeight; 
-	private int audioBitRate; 
+	private int videoBitRate;
+	private int videoHeight;
+	private int audioBitRate;
 
-	public H264Encoder(String file, String originDir, String targetDir){
-		this.fileName = file;
+	public H264Encoder(String fileName, File originDir, File targetDir) {
+		this.fileName = fileName;
 		this.originDir = originDir;
 		this.targetDir = targetDir;
-		this.tempDir = originDir + "_TEMP_ENCODING_"+fileName+File.separatorChar;
-		this.buffer = tempDir+"_SAFE_TO_DELETE_ANYTIME.garbage";
+		this.tempDir = new File(originDir + "_TEMP_ENCODING_" + fileName);
+		this.buffer = new File(tempDir + "_SAFE_TO_DELETE_ANYTIME.garbage");
 
-		File origin = new File(originDir+fileName);
-		if(!origin.exists()) {
-			throw new IllegalStateException("origin file does not exist: "+originDir+fileName);
+		File origin = new File(originDir, fileName);
+		if (!origin.exists()) {
+			throw new IllegalStateException("origin file does not exist: "
+					+ originDir + fileName);
 		}
-		File tmp = new File(tempDir);
+		File tmp = tempDir;
 		this.removeDirectory(tmp);
 		tmp.mkdirs();
-		new File(targetDir).mkdirs();
+		targetDir.mkdirs();
 	}
 
 	@Override
 	public File encode() {
 
-		String inFile = originDir+fileName;
+		String inFile = originDir + fileName;
 		String[] splittedFileName = fileName.split("\\.");
-		String extension  = splittedFileName[splittedFileName.length-1];
-		String tempFile = tempDir+fileName.replace(extension, tempExtension)+"."+targetExtension;
-		String outFile = targetDir+fileName.replace(extension, targetExtension);
+		String extension = splittedFileName[splittedFileName.length - 1];
+		String tempFile = tempDir + fileName.replace(extension, tempExtension)
+				+ "." + targetExtension;
+		String outFile = targetDir
+				+ fileName.replace(extension, targetExtension);
 
 		scanFile(inFile);
 
-		log.info("inFile: "+inFile);
-		log.info("buffer: "+buffer);
-		log.info("outFile: "+outFile);
-		log.info("videoBitRate: "+videoBitRate);
-		log.info("videoHeight: "+videoHeight);
-		log.info("audioCodec: "+audioCodec);
-		log.info("audioBitRate: "+audioBitRate);
+		log.info("inFile: " + inFile);
+		log.info("buffer: " + buffer);
+		log.info("outFile: " + outFile);
+		log.info("videoBitRate: " + videoBitRate);
+		log.info("videoHeight: " + videoHeight);
+		log.info("audioCodec: " + audioCodec);
+		log.info("audioBitRate: " + audioBitRate);
 
-		String firstPass  = "ffmpeg -i "+inFile+" -vcodec libx264 -vprofile high -preset slow -b:v "+videoBitRate+"k -maxrate "+videoBitRate+"k -bufsize "+videoBitRate*2+"k -vf scale=-1:"+videoHeight+" -threads 0 -pass 1 -an -f mp4 "+buffer;
-		String secondPass = "ffmpeg -i "+inFile+" -vcodec libx264 -vprofile high -preset slow -b:v "+videoBitRate+"k -maxrate "+videoBitRate+"k -bufsize "+videoBitRate*2+"k -vf scale=-1:"+videoHeight+" -threads 0 -pass 2 -acodec "+audioCodec+" -b:a "+audioBitRate+"k -f mp4 "+tempFile;
-		String thirdPass  = "qt-faststart "+tempFile+" "+outFile;
+		String firstPass = "ffmpeg -i " + inFile
+				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
+				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
+				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
+				+ " -threads 0 -pass 1 -an -f mp4 " + buffer;
+		String secondPass = "ffmpeg -i " + inFile
+				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
+				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
+				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
+				+ " -threads 0 -pass 2 -acodec " + audioCodec + " -b:a "
+				+ audioBitRate + "k -f mp4 " + tempFile;
+		String thirdPass = "qt-faststart " + tempFile + " " + outFile;
 
 		log.info(firstPass);
 		log.info(secondPass);
 		log.info(thirdPass);
 		File encodedFile = new File(outFile);
 		try {
-			new File(tempDir).mkdirs();
+			tempDir.mkdirs();
 			launchEncoding(firstPass);
-			log.debug("About to delete buffer: "+buffer);
-			new File(buffer).delete();
+			log.debug("About to delete buffer: " + buffer);
+			buffer.delete();
 			launchEncoding(secondPass);
 			launchEncoding(thirdPass);
-			
-			if(!new File(tempFile).renameTo(encodedFile)) {
-				String message = "unable to move encoded file " + tempFile +" to target file "+outFile;
+
+			if (!new File(tempFile).renameTo(encodedFile)) {
+				String message = "unable to move encoded file " + tempFile
+						+ " to target file " + outFile;
 				log.error(message);
 				throw new IllegalStateException(message);
 			}
 
-			this.removeDirectory(new File(tempDir));
-		} catch(IOException e){
-			log.error("Unable to encode video: "+inFile, e);
+			this.removeDirectory(tempDir);
+		} catch (IOException e) {
+			log.error("Unable to encode video: " + inFile, e);
 		}
 		return encodedFile;
 	}
@@ -108,21 +122,18 @@ public class H264Encoder implements Encoder{
 
 		// query how many streams the call to open found
 		int numStreams = container.getNumStreams();
-		videoBitRate = fixedVideoBitRate(container.getBitRate()/1000);
+		videoBitRate = fixedVideoBitRate(container.getBitRate() / 1000);
 
 		// and iterate through the streams to print their meta data
-		for(int i = 0; i < numStreams; i++)
-		{
+		for (int i = 0; i < numStreams; i++) {
 			// Find the stream object
 			IStream stream = container.getStream(i);
 			// Get the pre-configured decoder that can decode this stream;
 			IStreamCoder coder = stream.getStreamCoder();
-			if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_AUDIO)
-			{
-				//"libf"+coder.getCodec().getName(); 
-				audioBitRate = coder.getBitRate()/1024;
-			} else if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_VIDEO)
-			{
+			if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_AUDIO) {
+				// "libf"+coder.getCodec().getName();
+				audioBitRate = coder.getBitRate() / 1024;
+			} else if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_VIDEO) {
 				videoHeight = coder.getHeight();
 			}
 		}
@@ -133,15 +144,16 @@ public class H264Encoder implements Encoder{
 		return i >= fixedVideoBitRate ? fixedVideoBitRate : i;
 	}
 
-	public void launchEncoding(String proc) throws IOException{
+	public void launchEncoding(String proc) throws IOException {
 
 		log.debug("About to launch " + proc);
-		Process process = Runtime.getRuntime().exec(proc, new String[0], new File(tempDir));
-		InputHandler errorHandler = new
-				InputHandler(process.getErrorStream(), "Error Stream");
+		Process process = Runtime.getRuntime().exec(proc, new String[0],
+				tempDir);
+		InputHandler errorHandler = new InputHandler(process.getErrorStream(),
+				"Error Stream");
 		errorHandler.start();
-		InputHandler inputHandler = new
-				InputHandler(process.getInputStream(), "Output Stream");
+		InputHandler inputHandler = new InputHandler(process.getInputStream(),
+				"Output Stream");
 		inputHandler.start();
 		try {
 			process.waitFor();
@@ -180,20 +192,20 @@ public class H264Encoder implements Encoder{
 		}
 		return directory.delete();
 	}
-	
-//	public static void main(String[] args) {
-//
-//		List<String> pelis = Lists.<String>newArrayList(
-//				"BEBES_BAILANDO.mp4.b",
-//				"Cutest_Cat_Ever_.mp4.b",
-//				"Cutest_Cat_Ever_Part_2.mp4.b"
-//				);
-//		String origin = "/home/matias/Escritorio/Luther_Season_2_Complete_720p/";
-//		String target = origin + "TARGET"+ File.separatorChar;
-//		for(String peli : pelis){
-//			H264Encoder encoder = new H264Encoder(peli, origin, target);
-//			encoder.encode();
-//		}
-//	}
+
+	// public static void main(String[] args) {
+	//
+	// List<String> pelis = Lists.<String>newArrayList(
+	// "BEBES_BAILANDO.mp4.b",
+	// "Cutest_Cat_Ever_.mp4.b",
+	// "Cutest_Cat_Ever_Part_2.mp4.b"
+	// );
+	// String origin = "/home/matias/Escritorio/Luther_Season_2_Complete_720p/";
+	// String target = origin + "TARGET"+ File.separatorChar;
+	// for(String peli : pelis){
+	// H264Encoder encoder = new H264Encoder(peli, origin, target);
+	// encoder.encode();
+	// }
+	// }
 
 }

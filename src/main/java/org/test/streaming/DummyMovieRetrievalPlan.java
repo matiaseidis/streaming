@@ -23,7 +23,7 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		int requestSize = 1024 * 1024 * 64;
 		int amountOfRequests = 0;
 
-		String movieFileName = conf.get("test.video.file.name");
+		String movieFileName = conf.getCachosDir() + conf.get("test.video.file.name");
 		while (totalSize - totalRequested >= requestSize) {
 			requests.add(new CachoRetrieval(conf.getDaemonHost(), conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;

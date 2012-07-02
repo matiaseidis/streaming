@@ -11,10 +11,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Conf {
-	
+
 	protected static final Log log = LogFactory.getLog(Conf.class);
 	private String confPath = "/conf.properties";
-	
+
 	private String baseDir = "video.dir.base";
 	private String tempDir = "video.dir.temp";
 	private String cachosDir = "video.dir.cachos";
@@ -23,45 +23,55 @@ public class Conf {
 	private String monitorInterval = "monitor.interval";
 	private String daemonHost = "dimon.host";
 	private String daemonPort = "dimon.port";
-	
+
 	private Properties properties;
-	
-	public Conf(){
-			
-			Properties props = new Properties();
-	        try {
-	        	InputStream is = this.getClass().getResourceAsStream(confPath);
-				props.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.fatal("Unable to load configuration values form "+confPath+" - context shutdown.");
-				System.exit(1);
-			}
-	        this.properties = props;
-	        
-	        createDirOrShutDown(new File(this.getCachosDir()));
-	        createDirOrShutDown(new File(this.getSharedDir()));
-	        createDirOrShutDown(new File(this.getTempDir()));
-	}
-	
-	private void createDirOrShutDown(File dir) {
-		if(!dir.exists()) {
-        	if(!dir.mkdirs()) {
-        		log.fatal("Unable to create directory "+dir.getAbsolutePath()+" - context shutdown.");
-        		System.exit(1);
-        	}
-        }
+
+	public Conf(String confPath) {
+		this.confPath = confPath;
+		this.setUp();
 	}
 
-	public String getTempDir() {
+	public Conf() {
+		this.setUp();
+	}
+
+	protected void setUp() {
+		Properties props = new Properties();
+		try {
+			InputStream is = this.getClass().getResourceAsStream(confPath);
+			props.load(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.fatal("Unable to load configuration values form " + confPath
+					+ " - context shutdown.");
+			System.exit(1);
+		}
+		this.properties = props;
+
+		createDirOrShutDown(this.getCachosDir());
+		createDirOrShutDown(this.getSharedDir());
+		createDirOrShutDown(this.getTempDir());
+	}
+
+	private void createDirOrShutDown(File dir) {
+		if (!dir.exists()) {
+			if (!dir.mkdirs()) {
+				log.fatal("Unable to create directory " + dir.getAbsolutePath()
+						+ " - context shutdown.");
+				System.exit(1);
+			}
+		}
+	}
+
+	public File getTempDir() {
 		return getAppDir(get(tempDir));
 	}
 
-	public String getCachosDir() {
+	public File getCachosDir() {
 		return getAppDir(get(cachosDir));
 	}
 
-	public String getSharedDir() {
+	public File getSharedDir() {
 		return getAppDir(get(sharedDir));
 	}
 
@@ -73,9 +83,9 @@ public class Conf {
 		return Long.parseLong(get(monitorInterval));
 	}
 
-	public String get(String propertyKey){
+	public String get(String propertyKey) {
 		String result = properties.getProperty(propertyKey);
-		if(result == null) {
+		if (result == null) {
 			throw new PropertyNotFoundException(propertyKey);
 		}
 		return result;
@@ -90,20 +100,23 @@ public class Conf {
 	}
 
 	public int getIndexableSize() {
-		return 1024*1024;
+		return 1024 * 1024;
 	}
 
 	public String getBaseDir() {
 		return get(baseDir);
 	}
 
-	private String getAppDir(String dir) {
-		return System.getProperty("user.home") + 
-				File.separatorChar+ 
-				getBaseDir()+
-				File.separatorChar+
-				dir+
-				File.separatorChar;
+	private File getAppDir(String dir) {
+		return new File(this.getAbsoluteBaseDir(), dir);
 	}
-	
+
+	private File getAbsoluteBaseDir() {
+		return new File(this.getUserHomeDir(), this.getBaseDir());
+	}
+
+	protected File getUserHomeDir() {
+		return new File(System.getProperty("user.home"));
+	}
+
 }

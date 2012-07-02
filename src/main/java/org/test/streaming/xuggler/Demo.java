@@ -19,36 +19,35 @@ package org.test.streaming.xuggler;
  * along with Xuggle-Xuggler-Main.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-
 import org.test.streaming.Conf;
 
 import com.xuggle.mediatool.IMediaReader;
 import com.xuggle.mediatool.ToolFactory;
 
 /**
- * Takes a media container, finds the first video stream,
- * decodes that stream, and then displays the video frames,
- * at the frame-rate specified by the container, on a 
- * window.
+ * Takes a media container, finds the first video stream, decodes that stream,
+ * and then displays the video frames, at the frame-rate specified by the
+ * container, on a window.
+ * 
  * @author aclarke
- *
+ * 
  */
 public class Demo {
-	
+
 	public static void main(String[] args) {
 		// create a media reader
 		Conf conf = new Conf();
-		IMediaReader reader = ToolFactory.makeReader(conf.getSharedDir()/**/);
-		
+		IMediaReader reader = ToolFactory.makeReader(conf.getSharedDir()
+				.getAbsolutePath());
+
 		// add a viewer to the reader, to see the decoded media
 		reader.addListener(ToolFactory.makeWriter("output.mp4", reader));
-		
-		
+
 		// read and decode packets from the source file and
 		// and dispatch decoded audio and video to the writer
 		while (reader.readPacket() == null)
 			;
-		
+
 		System.out.println("ok");
 	}
 }

@@ -14,18 +14,18 @@ import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
 import org.test.streaming.encoding.H264Encoder;
 
-public class SharedVideosMonitor 
-extends FileAlterationListenerAdaptor {
+public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 
-	protected static final Log log = LogFactory.getLog(SharedVideosMonitor.class);
+	protected static final Log log = LogFactory
+			.getLog(SharedVideosMonitor.class);
 
-	//	private BaseModel baseModel;
+	// private BaseModel baseModel;
 
 	private final ExecutorService pool = Executors.newFixedThreadPool(20);
 
 	private String userId;
 
-	private String monitoredDir;
+	private File monitoredDir;
 	private long monitorInterval;
 
 	private Conf conf;
@@ -33,20 +33,18 @@ extends FileAlterationListenerAdaptor {
 	private FileAlterationObserver observer;
 	private FileAlterationMonitor monitor;
 
-	public SharedVideosMonitor(/*BaseModel baseModel, */Conf conf){
+	public SharedVideosMonitor(Conf conf) {
 
-		//		this.baseModel = baseModel;
 		monitoredDir = conf.getSharedDir();
 		monitorInterval = conf.getMonitorInterval();
 		observer = new FileAlterationObserver(monitoredDir);
 		monitor = new FileAlterationMonitor(monitorInterval);
 		this.conf = conf;
 		/*
-		 * TODO pedirle el user al dimon 
+		 * TODO pedirle el user al dimon
 		 */
 		userId = conf.get("test.user.id");
 	}
-
 
 	public void begin() throws Exception {
 
@@ -55,11 +53,11 @@ extends FileAlterationListenerAdaptor {
 		monitor.start();
 		log.debug("SharedVideosListener.begin()");
 	}
-	
-	public void end(){
+
+	public void end() {
 		try {
 			monitor.stop();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			log.error("Unable to stop the monitor", e);
 		}
 	}
@@ -70,17 +68,18 @@ extends FileAlterationListenerAdaptor {
 		/*
 		 * por ahora, solo soporte para mp4 y parts
 		 */
-//		if ( !newFile.getName().endsWith(".mp4")/* && !newFile.getName().endsWith(".part")*/){
-//			return;
-//		}
+		// if ( !newFile.getName().endsWith(".mp4")/* &&
+		// !newFile.getName().endsWith(".part")*/){
+		// return;
+		// }
 
-		if(newFile.getAbsolutePath().contains("_TEMP_ENCODING_")){
+		if (newFile.getAbsolutePath().contains("_TEMP_ENCODING_")) {
 			return;
 		}
-		
+
 		checkCompletness(newFile);
 
-		pool.submit(new Callable<String>(){
+		pool.submit(new Callable<String>() {
 
 			@Override
 			public String call() throws Exception {
@@ -88,16 +87,18 @@ extends FileAlterationListenerAdaptor {
 				File file = newFile;
 				File dest = null;
 
-				if(file.getName().contains(" ")) {
-					dest = new File(org.apache.commons.lang.StringUtils.replace(file.getAbsolutePath(), " ", "_"));
-					if ( !file.renameTo(dest) ){
+				if (file.getName().contains(" ")) {
+					dest = new File(org.apache.commons.lang.StringUtils
+							.replace(file.getAbsolutePath(), " ", "_"));
+					if (!file.renameTo(dest)) {
 						throw new RuntimeException("no puedo renombrar");
 					}
-					file= dest;
+					file = dest;
 				}
-				H264Encoder encoder = new H264Encoder(file.getName(), conf.getSharedDir(), conf.getCachosDir());
+				H264Encoder encoder = new H264Encoder(file.getName(), conf
+						.getSharedDir(), conf.getCachosDir());
 				File readyToShareVideo = encoder.encode();
-				
+
 				return new VideoRegistration(readyToShareVideo, conf).go();
 			}
 		});
@@ -108,7 +109,7 @@ extends FileAlterationListenerAdaptor {
 		long newSize = 1L;
 		boolean fileIsOpen = true;
 
-		while((newSize > oldSize) || fileIsOpen){
+		while ((newSize > oldSize) || fileIsOpen) {
 			oldSize = newFile.length();
 			try {
 				Thread.sleep(2000);
@@ -117,77 +118,82 @@ extends FileAlterationListenerAdaptor {
 			}
 			newSize = newFile.length();
 
-			try{
+			try {
 				new FileInputStream(newFile);
 				fileIsOpen = false;
-			}catch(Exception e){}
+			} catch (Exception e) {
+			}
 		}
 		log.info("New file complete: " + newFile.toString());
 	}
 
 	@Override
 	public void onFileDelete(final File file) {
-		//TODO ver como hacer en caso de borrado de file
-		//		de donde saco el ID?
+		// TODO ver como hacer en caso de borrado de file
+		// de donde saco el ID?
 
-		//		log.info("video borrado <"+file.getName()+">, actualizamos repo");
+		// log.info("video borrado <"+file.getName()+">, actualizamos repo");
 		//
-		//		pool.submit(new Callable<String>(){
+		// pool.submit(new Callable<String>(){
 		//
-		//			String result = null;
-		//			String videoId = null;
-		////			Cacho cacho = null;
-		//			
-		//			@Override
-		//			public String call() throws Exception {
-		//				
-		//				try {
-		//					LocalTracking tracking = getBaseModel().getModel();
-		//					videoId = tracking.getHashByVideoFileName(file.getName());
-		////					cacho = tracking.getCacho()
-		//				} catch (Exception e){
-		//					log.error("Video id not found in local repo for file " + file.getName());
-		//					return null;
-		//				}
+		// String result = null;
+		// String videoId = null;
+		// // Cacho cacho = null;
 		//
-		//				String [] meta = meta(file);
-		//				result = notifier.removeCacho(USER_ID, videoId, Long.valueOf(meta[0]), Long.valueOf(meta[1]));
+		// @Override
+		// public String call() throws Exception {
 		//
-		//				return result;
-		//			}
-		//		});
+		// try {
+		// LocalTracking tracking = getBaseModel().getModel();
+		// videoId = tracking.getHashByVideoFileName(file.getName());
+		// // cacho = tracking.getCacho()
+		// } catch (Exception e){
+		// log.error("Video id not found in local repo for file " +
+		// file.getName());
+		// return null;
+		// }
+		//
+		// String [] meta = meta(file);
+		// result = notifier.removeCacho(USER_ID, videoId,
+		// Long.valueOf(meta[0]), Long.valueOf(meta[1]));
+		//
+		// return result;
+		// }
+		// });
 	}
 
-	//	private String[] meta(File file) {
-	//		//a.mp4-1048576-1048576.part
-	//		String fileName = file.getName(); 
-	//		String[] meta = fileName.split("\\.");
-	//		Assert.isTrue(meta.length == 3);
-	//		String[] splittedMeta = meta[1].split("-");
-	//		Assert.isTrue(splittedMeta.length == 3);
+	// private String[] meta(File file) {
+	// //a.mp4-1048576-1048576.part
+	// String fileName = file.getName();
+	// String[] meta = fileName.split("\\.");
+	// Assert.isTrue(meta.length == 3);
+	// String[] splittedMeta = meta[1].split("-");
+	// Assert.isTrue(splittedMeta.length == 3);
 	//
-	//		return new String[]{splittedMeta[1], splittedMeta[2]};
-	//	}
+	// return new String[]{splittedMeta[1], splittedMeta[2]};
+	// }
 	public void onDirectoryDelete(final File directory) {
 
-		//		pool.submit(new Callable<String>(){
+		// pool.submit(new Callable<String>(){
 		//
-		//			@Override
-		//			public String call() throws Exception {
+		// @Override
+		// public String call() throws Exception {
 		//
-		//				log.info("El directorio compartido se borro, eliminamos todo del repo");
-		//				String result = null;
-		//				for (File file : directory.listFiles()){
-		//					
-		//					String videoId = getBaseModel().getModel().getHashByVideoFileName(file.getName());
-		//					
-		//					String [] meta = meta(file);
-		//					result = notifier.removeCacho(userId, videoId, Long.valueOf(meta[0]), Long.valueOf(meta[1]));
+		// log.info("El directorio compartido se borro, eliminamos todo del repo");
+		// String result = null;
+		// for (File file : directory.listFiles()){
 		//
-		//				}
-		//				return result;
-		//			}
-		//		});
+		// String videoId =
+		// getBaseModel().getModel().getHashByVideoFileName(file.getName());
+		//
+		// String [] meta = meta(file);
+		// result = notifier.removeCacho(userId, videoId, Long.valueOf(meta[0]),
+		// Long.valueOf(meta[1]));
+		//
+		// }
+		// return result;
+		// }
+		// });
 	}
 
 }
