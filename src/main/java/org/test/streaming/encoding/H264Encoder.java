@@ -2,12 +2,10 @@ package org.test.streaming.encoding;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.google.common.collect.Lists;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
@@ -21,25 +19,19 @@ public class H264Encoder implements Encoder{
 
 	protected static final Log log = LogFactory
 			.getLog(H264Encoder.class);
-
-	
 	
 	private final String originDir;
 	private String tempDir;
 	private final String targetDir;
-
 	private String targetExtension = "mp4";
 	private String tempExtension = "temp";
-
 	private String buffer;
-
 	private int fixedVideoBitRate = 875;
 	private String audioCodec = "libfaac"; 
 	private String fileName;
-	
-	int videoBitRate; 
-	int videoHeight; 
-	int audioBitRate; 
+	private int videoBitRate; 
+	private int videoHeight; 
+	private int audioBitRate; 
 
 	public H264Encoder(String file, String originDir, String targetDir){
 		this.fileName = file;
@@ -66,7 +58,6 @@ public class H264Encoder implements Encoder{
 		String extension  = splittedFileName[splittedFileName.length-1];
 		String tempFile = tempDir+fileName.replace(extension, tempExtension)+"."+targetExtension;
 		String outFile = targetDir+fileName.replace(extension, targetExtension);
-
 
 		scanFile(inFile);
 
@@ -99,10 +90,10 @@ public class H264Encoder implements Encoder{
 				log.error(message);
 				throw new IllegalStateException(message);
 			}
-//			encodedFile.createNewFile();
+
 			this.removeDirectory(new File(tempDir));
 		} catch(IOException e){
-			log.error(e);
+			log.error("Unable to encode video: "+inFile, e);
 		}
 		return encodedFile;
 	}
@@ -155,29 +146,11 @@ public class H264Encoder implements Encoder{
 		try {
 			process.waitFor();
 		} catch (InterruptedException e) {
+			log.error("encoding process interrupted", e);
 			throw new IOException("process interrupted");
 		}
 		log.debug("exit code: " + process.exitValue());
 	}
-
-	public static void main(String[] args) {
-
-		List<String> pelis = Lists.<String>newArrayList(
-				"BEBES_BAILANDO.mp4.b",
-				"Cutest_Cat_Ever_.mp4.b",
-				"Cutest_Cat_Ever_Part_2.mp4.b"
-				);
-
-		String origin = "/home/matias/Escritorio/Luther_Season_2_Complete_720p/";
-		String target = origin + "TARGET"+ File.separatorChar;
-		for(String peli : pelis){
-
-			H264Encoder encoder = new H264Encoder(peli, origin, target);
-			encoder.encode();
-
-		}
-	}
-
 
 	private boolean removeDirectory(File directory) {
 
@@ -196,19 +169,31 @@ public class H264Encoder implements Encoder{
 			for (int i = 0; i < list.length; i++) {
 				File entry = new File(directory, list[i]);
 
-				if (entry.isDirectory())
-				{
+				if (entry.isDirectory()) {
 					if (!removeDirectory(entry))
 						return false;
-				}
-				else
-				{
+				} else {
 					if (!entry.delete())
 						return false;
 				}
 			}
 		}
-
 		return directory.delete();
 	}
+	
+//	public static void main(String[] args) {
+//
+//		List<String> pelis = Lists.<String>newArrayList(
+//				"BEBES_BAILANDO.mp4.b",
+//				"Cutest_Cat_Ever_.mp4.b",
+//				"Cutest_Cat_Ever_Part_2.mp4.b"
+//				);
+//		String origin = "/home/matias/Escritorio/Luther_Season_2_Complete_720p/";
+//		String target = origin + "TARGET"+ File.separatorChar;
+//		for(String peli : pelis){
+//			H264Encoder encoder = new H264Encoder(peli, origin, target);
+//			encoder.encode();
+//		}
+//	}
+
 }
