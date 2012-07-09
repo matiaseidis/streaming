@@ -4,15 +4,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
-    
-    private final String videoId;
-    private final Conf conf;
-    
-    public DummyMovieRetrievalPlan(String videoId, Conf conf){
-        super();
-        this.videoId = videoId;
-        this.conf = conf;
-    }
+
+	private final String videoId;
+	private final Conf conf;
+
+	public DummyMovieRetrievalPlan(String videoId, Conf conf) {
+		super();
+		this.videoId = videoId;
+		this.conf = conf;
+	}
 
 	@Override
 	public List<CachoRetrieval> getRequests() {
@@ -23,7 +23,7 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		int requestSize = 1024 * 1024 * 64;
 		int amountOfRequests = 0;
 
-		String movieFileName = conf.getCachosDir() + conf.get("test.video.file.name");
+		String movieFileName = conf.get("test.video.file.name");
 		while (totalSize - totalRequested >= requestSize) {
 			requests.add(new CachoRetrieval(conf.getDaemonHost(), conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;
@@ -37,6 +37,5 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 	public String getVideoId() {
 		return videoId;
 	}
-
 
 }

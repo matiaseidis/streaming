@@ -1,8 +1,5 @@
 package org.test.streaming;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -18,13 +15,12 @@ import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class CachoRequester {
 
-	private final String host;
-	private final int port;
-
+	private String host;
+	private int port;
 
 	public CachoRequester(String host, int port) {
-		this.host = host;
-		this.port = port;
+		this.setHost(host);
+		this.setPort(port);
 	}
 
 	public void requestCacho(String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes, final OutputStream out) {
@@ -42,7 +38,7 @@ public class CachoRequester {
 		});
 
 		// Start the connection attempt.
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()));
 		bootstrap.setOption("tcpNoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		// Wait until the connection is closed or the connection attempt fails.
@@ -55,6 +51,22 @@ public class CachoRequester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 }

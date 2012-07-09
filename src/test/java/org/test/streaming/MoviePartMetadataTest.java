@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 
+import junit.framework.Assert;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -27,6 +29,17 @@ public class MoviePartMetadataTest {
 
 	public MoviePartMetadataCachoMatcher hasMovieCacho(Matcher<MovieCacho> cachoMatcher) {
 		return new MoviePartMetadataCachoMatcher(cachoMatcher);
+	}
+
+	@Test
+	public void testMovieFileIsProperlyCreated() throws Exception {
+		Conf conf = new Conf("/test-conf.properties");
+		String movieName = "Luther.S02E01.720p.HDTV.x264-3.mp3";
+		MoviePartMetadata moviePartMetadata = new MoviePartMetadata(conf.getCachosDir(), movieName, 0, 1024);
+		File actualMovieFile = moviePartMetadata.getCacho().getMovieFile();
+		File expectedMovieFile = new File(conf.getCachosDir(), movieName + "-0-1024.part");
+		Assert.assertEquals(expectedMovieFile, actualMovieFile);
+
 	}
 
 	public static class MoviePartMetadataCachoMatcher extends BaseMatcher {

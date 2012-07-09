@@ -28,7 +28,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 		CachoRetrieval firstCacho = requests.get(0);
 		final CachoRequester cachoRequester = new CachoRequester(firstCacho.getHost(), firstCacho.getPort());
 		final CachoRequest request = firstCacho.getRequest();
-		final DirectCachoStreamer firstStreamer = new DirectCachoStreamer(this.getShareDir(), out, request.getLength(), createPartFile(request), new OnCachoComplete() {
+		final DirectCachoStreamer firstStreamer = new DirectCachoStreamer(this.getShareDir(), out, request.getLength(), this.createPartFile(request), new OnCachoComplete() {
 
 			@Override
 			public void onCachoComplete(CachoStreamer streamer) {
@@ -44,7 +44,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 		};
 		tasks.add(runnable);
 		for (final CachoRetrieval a : requests.subList(1, requests.size())) {
-			final BackgroundCachoStreamer cachoStreamer = new BackgroundCachoStreamer(this.getShareDir(), createPartFile(a.getRequest()), out, a.getRequest().getFirstByteIndex(), a.getRequest().getLength(), new OnCachoComplete() {
+			final BackgroundCachoStreamer cachoStreamer = new BackgroundCachoStreamer(this.getShareDir(), this.createPartFile(a.getRequest()), out, a.getRequest().getFirstByteIndex(), a.getRequest().getLength(), new OnCachoComplete() {
 
 				@Override
 				public void onCachoComplete(CachoStreamer streamer) {
