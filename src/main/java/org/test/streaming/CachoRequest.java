@@ -9,6 +9,7 @@ public class CachoRequest implements Serializable {
 	private String movieId;
 	private String fileName;
 	private MovieCacho cacho;
+	private CachoDirection direction = CachoDirection.PULL;
 
 	public CachoRequest() {
 	}
@@ -55,6 +56,14 @@ public class CachoRequest implements Serializable {
 
 	public void setCacho(MovieCacho cacho) {
 		this.cacho = cacho;
+	}
+
+	public CachoDirection getDirection() {
+		return direction;
+	}
+
+	public void setDirection(CachoDirection direction) {
+		this.direction = direction;
 	}
 
 }
