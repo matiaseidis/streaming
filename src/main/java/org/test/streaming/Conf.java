@@ -92,7 +92,7 @@ public class Conf {
 	}
 
 	public String getDaemonHost() {
-		return get(daemonHost);
+		return get(daemonHost).trim();
 	}
 
 	public int getDaemonPort() {
