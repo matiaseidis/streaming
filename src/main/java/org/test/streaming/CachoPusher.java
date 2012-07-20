@@ -1,7 +1,8 @@
 package org.test.streaming;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
@@ -13,24 +14,25 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
-public class CachoRequester {
+public class CachoPusher {
 
-	private String host;
+	private String remoteDaemonHost;
 	private int port;
 
-	public CachoRequester(String host, int port) {
-		this.setHost(host);
+	public CachoPusher(String remoteDaemonHost, int port) {
+		this.setRemoteDaemonHost(remoteDaemonHost);
 		this.setPort(port);
 	}
 
-	public void requestCacho(String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes, final OutputStream out) {
-		CachoRequest cachoRequest = new CachoRequest(null, movieFileName, zeroBasedFirstBytePosition, amountOfBytes);
+	public void push(InputStream input, String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes) {
+		CachoRequest cachoRequest = new CachoRequest(null, movieFileName, zeroBasedFirstBytePosition, amountOfBytes, CachoDirection.PUSH);
 
 		// Configure the client.
 		ClientBootstrap bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
 
 		// Set up the pipeline factory.
-		final ChannelPipeline pipeline = Channels.pipeline(new ObjectEncoder(), new CachoClientPullJandler(cachoRequest, out));
+		BufferedInputStream input2 = new BufferedInputStream(input);
+		final ChannelPipeline pipeline = Channels.pipeline(new ObjectEncoder(), new CachoClientPushJandler(cachoRequest, input2));
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			public ChannelPipeline getPipeline() throws Exception {
 				return pipeline;
@@ -38,7 +40,7 @@ public class CachoRequester {
 		});
 
 		// Start the connection attempt.
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(this.getRemoteDaemonHost(), this.getPort()));
 		bootstrap.setOption("tcpNoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		// Wait until the connection is closed or the connection attempt fails.
@@ -46,19 +48,12 @@ public class CachoRequester {
 		// Shut down thread pools to exit.
 		bootstrap.releaseExternalResources();
 		try {
-			out.close();
+			input2.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
 
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
 	}
 
 	public int getPort() {
@@ -67,6 +62,14 @@ public class CachoRequester {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public String getRemoteDaemonHost() {
+		return remoteDaemonHost;
+	}
+
+	public void setRemoteDaemonHost(String remoteDaemonHost) {
+		this.remoteDaemonHost = remoteDaemonHost;
 	}
 
 }

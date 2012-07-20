@@ -14,7 +14,7 @@ public class CachoRequesterTest {
 
 	@Test
 	public void testStream() throws Exception {
-		Conf conf = new Conf("/test-conf.properties");
+		Conf conf = new Conf("/alt-test-conf.properties");
 		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
 		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos);
 		baos.flush();

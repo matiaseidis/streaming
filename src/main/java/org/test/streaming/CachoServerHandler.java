@@ -1,11 +1,14 @@
 package org.test.streaming;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,13 @@ public class CachoServerHandler extends SimpleChannelHandler {
 	double transferCostFactor = 2;
 	private Conf conf;
 
+	private Index index = new NullIndex();
+
+	private OutputStream pushedCachoStream;
+	private CachoRequest currentRequest;
+	private int receivedBytes = 0;
+	private MoviePartMetadata receivingCachoMetadata;
+
 	public CachoServerHandler(Conf conf) {
 		this.setConf(conf);
 		File cachosDir = this.getConf().getCachosDir();
@@ -50,25 +60,45 @@ public class CachoServerHandler extends SimpleChannelHandler {
 			this.getChannelStatus().put(e.getChannel(), request.getDirection());
 			cachoDirection = request.getDirection();
 			if (cachoDirection == CachoDirection.PULL) {
-				this.sendCacho(e);
+				this.sendCacho(ctx, e);
 				this.getChannelStatus().remove(e.getChannel());
 			} else if (cachoDirection == CachoDirection.PUSH) {
 				// just wait for next messsage with cachos' bytes
 				ChannelHandler objectDecoder = ctx.getPipeline().removeFirst();
 				log.debug("Removed handler " + objectDecoder);
+
+				this.setCurrentRequest(request);
+				this.setReceivedBytes(0);
+				MoviePartMetadata moviePartMetadata = new MoviePartMetadata(this.getConf().getTempDir(), request.getFileName(), request.getFirstByteIndex(), request.getLength());
+				this.setReceivingCachoMetadata(moviePartMetadata);
+				this.setPushedCachoStream(new BufferedOutputStream(new FileOutputStream(moviePartMetadata.getCacho().getMovieFile())));
 			}
 		} else {
-			log.debug("Receiving PUSH data...");
 			// must be a push with actual cachos' bytes
 			this.receiveCacho(ctx, e);
 		}
 	}
 
-	private void receiveCacho(ChannelHandlerContext ctx, MessageEvent e) {
-
+	private void receiveCacho(ChannelHandlerContext ctx, MessageEvent e) throws IOException {
+		ChannelBuffer cacho = (ChannelBuffer) e.getMessage();
+		int readableBytes = cacho.readableBytes();
+		cacho.readBytes(this.getPushedCachoStream(), readableBytes);
+		this.setReceivedBytes(this.getReceivedBytes() + readableBytes);
+		if (this.getReceivedBytes() == this.getCurrentRequest().getLength()) {
+			this.getPushedCachoStream().close();
+			log.info("Cacho received successfully.");
+			File receivedCacho = this.getReceivingCachoMetadata().getCacho().getMovieFile();
+			File dest = new File(this.getConf().getCachosDir(), receivedCacho.getName());
+			if (!receivedCacho.renameTo(dest)) {
+				log.warn("Failed to move cacho file " + receivedCacho + " to share dir: " + dest);
+				dest = receivedCacho;
+			}
+			this.getIndex().newCachoAvailableLocally(this.getReceivingCachoMetadata().getCacho());
+			this.getChannelStatus().remove(e.getChannel());
+		}
 	}
 
-	private void sendCacho(MessageEvent e) throws FileNotFoundException, IOException {
+	private void sendCacho(ChannelHandlerContext ctx, MessageEvent e) throws FileNotFoundException, IOException {
 		CachoRequest request = (CachoRequest) e.getMessage();
 		log.debug("Cacho requested  " + request);
 		List<MovieCachoFile> files = this.getMovieFileLocator().locate(request);
@@ -78,35 +108,14 @@ public class CachoServerHandler extends SimpleChannelHandler {
 			return;
 		}
 		log.debug("Cacho file located: " + files);
-		int t = 0;
-		int b = 1024 * 1024 * 4;
 		log.debug("Uploading cacho...");
 		for (MovieCachoFile mayBeMovieFile : files) {
 			RandomAccessFile raf = new RandomAccessFile(mayBeMovieFile.getMovieFile(), "r");
 			raf.seek(mayBeMovieFile.getCacho().getFirstByteIndex());
 			InputStream fileInputStream = new BufferedInputStream(new FileInputStream(raf.getFD()));
-			try {
-				int s = mayBeMovieFile.getCacho().getLength() / b;
-				int r = mayBeMovieFile.getCacho().getLength() % b;
-				for (int i = 0; i < s; i++) {
-					ChannelBuffer outBuffer = ChannelBuffers.buffer(b);
-					outBuffer.writeBytes(fileInputStream, outBuffer.writableBytes());
-					t += outBuffer.readableBytes();
-					e.getChannel().write(outBuffer);
-				}
-
-				if (r != 0) {
-					ChannelBuffer outBuffer = ChannelBuffers.buffer(r);
-					outBuffer.writeBytes(fileInputStream, outBuffer.writableBytes());
-					t += outBuffer.readableBytes();
-					e.getChannel().write(outBuffer);
-				}
-			} finally {
-				fileInputStream.close();
-			}
+			new CachoWriter().uploadCacho(e.getChannel(), fileInputStream, mayBeMovieFile.getCacho().getLength());
 		}
 		e.getChannel().write(ChannelBuffers.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-		log.debug("Uploaded " + t + " bytes.");
 	}
 
 	public MovieFileLocator getMovieFileLocator() {
@@ -131,6 +140,46 @@ public class CachoServerHandler extends SimpleChannelHandler {
 
 	public void setChannelStatus(Map<Channel, CachoDirection> channelStatus) {
 		this.channelStatus = channelStatus;
+	}
+
+	public OutputStream getPushedCachoStream() {
+		return pushedCachoStream;
+	}
+
+	public void setPushedCachoStream(OutputStream pushedCachoStream) {
+		this.pushedCachoStream = pushedCachoStream;
+	}
+
+	public CachoRequest getCurrentRequest() {
+		return currentRequest;
+	}
+
+	public void setCurrentRequest(CachoRequest currentRequest) {
+		this.currentRequest = currentRequest;
+	}
+
+	public int getReceivedBytes() {
+		return receivedBytes;
+	}
+
+	public void setReceivedBytes(int receivedBytes) {
+		this.receivedBytes = receivedBytes;
+	}
+
+	public MoviePartMetadata getReceivingCachoMetadata() {
+		return receivingCachoMetadata;
+	}
+
+	public void setReceivingCachoMetadata(MoviePartMetadata receivingCachoMetadata) {
+		this.receivingCachoMetadata = receivingCachoMetadata;
+	}
+
+	public Index getIndex() {
+		return index;
+	}
+
+	public void setIndex(Index index) {
+		this.index = index;
 	}
 
 }

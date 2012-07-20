@@ -14,6 +14,11 @@ public class CachoRequest implements Serializable {
 	public CachoRequest() {
 	}
 
+	public CachoRequest(String movieId, String fileName, int firstByte, int length, CachoDirection direction) {
+		this(movieId, fileName, firstByte, length);
+		this.setDirection(direction);
+	}
+
 	public CachoRequest(String movieId, String fileName, int firstByte, int length) {
 		super();
 		this.setMovieId(movieId);

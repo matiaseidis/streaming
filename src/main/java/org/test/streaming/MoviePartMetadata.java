@@ -13,8 +13,8 @@ public class MoviePartMetadata {
 		this.setCacho(new MovieCachoFile(new MovieCacho(firstByte, length), new File(dir, fileName + this.getMetadataSeparator() + firstByte + this.getMetadataSeparator() + length + this.getExtensionSeparator() + this.getPartFileExtension())));
 	}
 
-	public MoviePartMetadata(File file) {
-		String movieFileName = file.getName();
+	public MoviePartMetadata(File cachoFile) {
+		String movieFileName = cachoFile.getName();
 		int beginIndex = movieFileName.indexOf(this.getMetadataSeparator()) + 1;
 		if (beginIndex == -1) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + "  (first metadata separator not found)");
@@ -38,7 +38,7 @@ public class MoviePartMetadata {
 		try {
 			int firstByte = Integer.parseInt(metadataAtts[metadataAtts.length - 2]);
 			int length = Integer.parseInt(metadataAtts[metadataAtts.length - 1]);
-			this.setCacho(new MovieCachoFile(new MovieCacho(firstByte, length), file));
+			this.setCacho(new MovieCachoFile(new MovieCacho(firstByte, length), cachoFile));
 		} catch (NumberFormatException e) {
 			throw new InvalidMovieMetadataException("Failed to parse metadata from file name " + movieFileName + " (expected 2 int filed, found " + metadataAtts[0] + " and " + metadataAtts[1] + " )");
 		}
