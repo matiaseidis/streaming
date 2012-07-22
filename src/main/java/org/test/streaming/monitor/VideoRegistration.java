@@ -1,11 +1,15 @@
 package org.test.streaming.monitor;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
 import org.test.streaming.Hasher;
+
+import com.google.gson.Gson;
 
 public class VideoRegistration {
 
@@ -25,10 +29,10 @@ public class VideoRegistration {
 		this.indexableSize = conf.getIndexableSize();
 	} 
 	
-	String go(){
+	public RegistrationResponse go(){
 		String videoFileName = video.getName();
-		File file = new File(conf.getCachosDir()+videoFileName);
-		String hash = hasher.hashVideo(file); 
+//		File file = new File(conf.getCachosDir()+videoFileName);
+		String videoId = hasher.hashVideo(video); 
 		
 		long videoFileSize = video.length();
 		int totalChunks = (int) videoFileSize / indexableSize;
@@ -37,11 +41,15 @@ public class VideoRegistration {
 			totalChunks++;
 		}
 		
-		String chunks = hasher.encodeChunksForRegistration(file, totalChunks, 0, indexableSize);
+		String chunks = hasher.encodeChunksForRegistration(video, totalChunks, 0, indexableSize);
 		
-		String registrationResponse  = notifier.registerVideo(hash, videoFileName, videoFileSize, chunks);
-		log.info("Hashed full video: "+hash+" - "+videoFileName+" - "+ videoFileSize +" - "+ chunks);
+		String registrationResponse  = notifier.registerVideo(videoId, videoFileName, videoFileSize, chunks);
+		log.info("Hashed full video: "+videoId+" - "+videoFileName+" - "+ videoFileSize +" - "+ chunks);
 		
-		return registrationResponse;
+		LinkedHashMap json = new Gson().fromJson(registrationResponse, LinkedHashMap.class);
+		
+		String code = json == null ? "CONNECTION_ERROR" : (String)json.get("code");
+		
+		return new RegistrationResponse(videoId, video.getName(), code, json.get("body").toString(), 0, videoFileSize, totalChunks);
 	}
 }

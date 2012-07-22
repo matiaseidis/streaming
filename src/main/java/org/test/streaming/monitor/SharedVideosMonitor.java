@@ -79,10 +79,10 @@ public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 
 		checkCompletness(newFile);
 
-		pool.submit(new Callable<String>() {
+		pool.submit(new Callable<RegistrationResponse>() {
 
 			@Override
-			public String call() throws Exception {
+			public RegistrationResponse call() throws Exception {
 
 				File file = newFile;
 				File dest = null;

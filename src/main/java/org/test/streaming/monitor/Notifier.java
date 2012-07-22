@@ -1,15 +1,24 @@
 package org.test.streaming.monitor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.test.streaming.CachoRequest;
+import org.test.streaming.CachoRetrieval;
 import org.test.streaming.Conf;
+import org.test.streaming.MovieCacho;
+import org.test.streaming.MovieRetrievalPlan;
+import org.test.streaming.User;
+import org.test.streaming.WatchMovieRetrievalPlan;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.StringMap;
 
 public class Notifier {
 	
@@ -33,9 +42,46 @@ public class Notifier {
 		return new IndexRequester("video/list").get();	
 	}
 
-	public String getGrafo(String videoId, String userId){
+	public MovieRetrievalPlan getRetrievalPlan(String videoId, String userId){
 
-		return new IndexRequester("plan/"+videoId+"/"+userId).get();
+		String rp = new IndexRequester(conf.getNotifierUrl()+"plan/"+videoId+"/"+userId).get();
+		
+		LinkedHashMap json = new Gson().fromJson(rp, LinkedHashMap.class);
+
+		String fileName = ((StringMap)((StringMap)json.get("body")).get("video")).get("fileName").toString();
+		
+		/*
+		 * viene otro videoId del indice
+		 */
+		String id = ((StringMap)((StringMap)json.get("body")).get("video")).get("id").toString();
+		if (!videoId.equals(id)) {
+			throw new RuntimeException("no  puede pasar esto");
+		}
+
+		WatchMovieRetrievalPlan retrievalPlan = new WatchMovieRetrievalPlan(videoId);
+		ArrayList<StringMap> userCachos = ((ArrayList<StringMap>)((StringMap)json.get("body")).get("userCachos"));
+
+		for (StringMap userCacho : userCachos) {
+			StringMap userCachoUser = (StringMap)userCacho.get("user");
+			StringMap userCachoMap = (StringMap)userCacho.get("cacho");
+			String from = userCachoMap.get("from").toString();
+			String lenght = userCachoMap.get("lenght").toString();
+			
+			CachoRequest cachoRequest = new CachoRequest();
+			cachoRequest.setCacho(new MovieCacho(Integer.valueOf(from.split("\\.")[0]), Integer.valueOf(lenght.split("\\.")[0])));
+			cachoRequest.setFileName(fileName);
+			cachoRequest.setMovieId(videoId);
+
+			
+			CachoRetrieval cachoRetrieval = new CachoRetrieval();
+			cachoRetrieval.setHost(userCachoUser.get("ip").toString());
+			cachoRetrieval.setPort(Integer.valueOf(userCachoUser.get("port").toString().split("\\.")[0].toString()));
+			cachoRetrieval.setRequest(cachoRequest);
+			
+			retrievalPlan.getRequests().add(cachoRetrieval);
+		}
+		return retrievalPlan;
+		
 	}
 
 	public String registerParts(String fileName, String chunks) {
@@ -65,6 +111,13 @@ public class Notifier {
 		result = result.substring(0, result.length()-1);
 		System.out.println(result);
 		return result;
+	}
+
+	public String registerUser(User user) {
+		//add/{nombre}/{email}/{ip}/{port}
+		String url = conf.getNotifierUrl()+"user/add/"+user.getId()+"/"+user.getEmail()+"/"+user.getIp()+"/"+user.getPort();
+		return new IndexRequester(url).post(null);	
+		
 	}
 
 }

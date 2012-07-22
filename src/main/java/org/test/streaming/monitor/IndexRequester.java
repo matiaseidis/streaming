@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -45,6 +46,10 @@ public class IndexRequester {
 	public String post(Map<String, String> params) {
 
 		String response = null;
+		
+		if(params == null) {
+			params = new HashMap<String, String>();
+		}
 
 		try{
 			URL url = new URL(urlString);
