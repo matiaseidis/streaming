@@ -1,9 +1,11 @@
 package org.test.streaming;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,14 +15,13 @@ import org.test.streaming.monitor.RegistrationResponse;
 import org.test.streaming.monitor.UserRegistration;
 import org.test.streaming.monitor.VideoRegistration;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.StringMap;
-
 public class VideoRegistrationFullCycleTest {
 
 
 	String videoChunks;
-	
+	/**
+	 * El indice tiene que estar levantado. 
+	 */
 	@Test
 	public void testRestrievalPlan(){
 
@@ -84,11 +85,32 @@ public class VideoRegistrationFullCycleTest {
 		WatchMovieRetrievalPlan secondRetrievalPlan = (WatchMovieRetrievalPlan) notifier.getRetrievalPlan(videoRegistrationResponse.getId(), otroUser.getId());
 		
 		Assert.assertEquals(secondRetrievalPlan.getRequests().size(), 2);
-		Assert.assertEquals(secondRetrievalPlan.getRequests().get(0).getHost(), user.getIp());
-		Assert.assertEquals(secondRetrievalPlan.getRequests().get(1).getHost(), otroUser.getIp());
 		Assert.assertNotSame(secondRetrievalPlan.getVideoId(), cachoRegistrationResponse.getId());
-		Assert.assertEquals(secondRetrievalPlan.getRequests().get(0).getRequest().getLength(), video.length() - cachoLenght);
-		Assert.assertEquals(secondRetrievalPlan.getRequests().get(1).getRequest().getLength(), cachoLenght);
+
+		List<String> ips = (List<String>) CollectionUtils.collect(secondRetrievalPlan.getRequests(), new Transformer(){
+
+			@Override
+			public Object transform(Object input) {
+				CachoRetrieval cachoRetrieval = (CachoRetrieval)input;
+				return cachoRetrieval.getHost();
+			}
+			
+		});
 		
+		Assert.assertTrue(ips.contains(user.getIp()));
+		Assert.assertTrue(ips.contains(otroUser.getIp()));
+		
+		Collection<Integer> lenghts = CollectionUtils.collect(secondRetrievalPlan.getRequests(), new Transformer(){
+
+			@Override
+			public Object transform(Object input) {
+				CachoRetrieval cachoRetrieval = (CachoRetrieval)input;
+				return cachoRetrieval.getRequest().getLength();
+			}
+			
+		});
+
+		Assert.assertTrue(lenghts.contains(cachoLenght));
+		Assert.assertTrue(lenghts.contains(((int)video.length() - cachoLenght)));
 	}
 }

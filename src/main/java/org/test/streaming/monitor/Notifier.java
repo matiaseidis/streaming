@@ -86,7 +86,7 @@ public class Notifier {
 
 	public String registerChunks(String fileName, String userId, String chunks) {
 		String url = conf.getNotifierUrl()+"video/registerChunks/"+fileName+"/"+userId+"/"+chunks;
-		return new IndexRequester(url).get();	
+		return new IndexRequester(url).post(null);	
 	}
 
 	public String registerVideo(String videoId, String fileName, long lenght, String chunks) {
