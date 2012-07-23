@@ -65,30 +65,12 @@ public class H264Encoder implements Encoder {
 
 		scanFile(inFile);
 
-		log.info("inFile: " + inFile);
-		log.info("buffer: " + buffer);
-		log.info("outFile: " + outFile);
-		log.info("videoBitRate: " + videoBitRate);
-		log.info("videoHeight: " + videoHeight);
-		log.info("audioCodec: " + audioCodec);
-		log.info("audioBitRate: " + audioBitRate);
+		log.info("About to start encoding for inFile: " + inFile+" - buffer: " + buffer+" - outFile: " + outFile+" - videoBitRate: " + videoBitRate+" - videoHeight: " + videoHeight+" - audioCodec: " + audioCodec+" - audioBitRate: " + audioBitRate);
 
-		String firstPass = "ffmpeg -i " + inFile
-				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
-				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
-				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
-				+ " -threads 0 -pass 1 -an -f mp4 " + buffer;
-		String secondPass = "ffmpeg -i " + inFile
-				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
-				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
-				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
-				+ " -threads 0 -pass 2 -acodec " + audioCodec + " -b:a "
-				+ audioBitRate + "k -f mp4 " + tempFile;
-		String thirdPass = "qt-faststart " + tempFile + " " + outFile;
-
-		log.info(firstPass);
-		log.info(secondPass);
-		log.info(thirdPass);
+		String firstPass = firstStep(inFile);
+		String secondPass = secondStep(inFile, tempFile);
+		String thirdPass = thirdStep(tempFile, outFile);
+		
 		File encodedFile = new File(outFile);
 		try {
 			tempDir.mkdirs();
@@ -110,6 +92,33 @@ public class H264Encoder implements Encoder {
 			log.error("Unable to encode video: " + inFile, e);
 		}
 		return encodedFile;
+	}
+
+	private String firstStep(String inFile) {
+		String step = "ffmpeg -i " + inFile
+				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
+				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
+				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
+				+ " -threads 0 -pass 1 -an -f mp4 " + buffer;
+		log.info(step);
+		return step;
+	}
+
+	private String secondStep(String inFile, String tempFile) {
+		String step =  "ffmpeg -i " + inFile
+				+ " -vcodec libx264 -vprofile high -preset slow -b:v "
+				+ videoBitRate + "k -maxrate " + videoBitRate + "k -bufsize "
+				+ videoBitRate * 2 + "k -vf scale=-1:" + videoHeight
+				+ " -threads 0 -pass 2 -acodec " + audioCodec + " -b:a "
+				+ audioBitRate + "k -f mp4 " + tempFile;
+		log.info(step);
+		return step;
+	}
+
+	private String thirdStep(String tempFile, String outFile) {
+		String step = "qt-faststart " + tempFile + " " + outFile; 
+		log.info(step);
+		return step;
 	}
 
 	private void scanFile(String inFile) {
