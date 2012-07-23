@@ -11,7 +11,7 @@ import org.test.streaming.Hasher;
 
 import com.google.gson.Gson;
 
-public class VideoRegistration {
+public class VideoRegistration implements Registration{
 
 	protected static final Log log = LogFactory.getLog(VideoRegistration.class);
 	private final File video;
@@ -29,7 +29,7 @@ public class VideoRegistration {
 		this.indexableSize = conf.getIndexableSize();
 	} 
 	
-	public RegistrationResponse go(){
+	public RegistrationResponse register(){
 		String videoFileName = video.getName();
 //		File file = new File(conf.getCachosDir()+videoFileName);
 		String videoId = hasher.hashVideo(video); 

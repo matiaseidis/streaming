@@ -99,7 +99,7 @@ public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 						.getSharedDir(), conf.getCachosDir());
 				File readyToShareVideo = encoder.encode();
 
-				return new VideoRegistration(readyToShareVideo, conf).go();
+				return new VideoRegistration(readyToShareVideo, conf).register();
 			}
 		});
 	}

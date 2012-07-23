@@ -23,6 +23,6 @@ public class Chasqui implements Index {
 			return;
 		}
 		
-		new CachoRegistration(movieCachoFile, conf).go();
+		new CachoRegistration(movieCachoFile, conf).register();
 	}
 }

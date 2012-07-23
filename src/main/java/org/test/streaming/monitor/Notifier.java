@@ -31,7 +31,7 @@ public class Notifier {
 	
 	public List<String> listChunks(String videoId){
 		
-		String response = new IndexRequester("video/getChunks/"+videoId+"/"+conf.get("test.user.id")).get();
+		String response = new IndexRequester(conf.getNotifierUrl()+"video/getChunks/"+videoId+"/"+conf.get("test.user.id")).get();
 		@SuppressWarnings("unchecked")
 		List<String> chunkIds = new Gson().fromJson(response, List.class);
 		return chunkIds;  	
@@ -84,9 +84,9 @@ public class Notifier {
 		
 	}
 
-	public String registerParts(String fileName, String chunks) {
-
-		return new IndexRequester("video/registerChunks/"+fileNameFromPart(fileName)+"/"+conf.get("test.user.id")+"/"+chunks).get();	
+	public String registerChunks(String fileName, String userId, String chunks) {
+		String url = conf.getNotifierUrl()+"video/registerChunks/"+fileName+"/"+userId+"/"+chunks;
+		return new IndexRequester(url).get();	
 	}
 
 	public String registerVideo(String videoId, String fileName, long lenght, String chunks) {
@@ -99,19 +99,19 @@ public class Notifier {
 		return new IndexRequester(url).post(params);
 	}
 	
-	//TODO meter esto en el objeto de MEtaDAta que ya existe
-	private String fileNameFromPart(String fileName) {
-		// Luther.S02E01.720p.HDTV.x264-3.mp4-67108864-67108864.part
-		String[] splittedFileName = fileName.split("-");
-		String result = StringUtils.EMPTY;
-		int pieces = splittedFileName.length-2;
-		for(int i=0; i<pieces; i++) {
-			result +=splittedFileName[i]+"-";
-		}
-		result = result.substring(0, result.length()-1);
-		System.out.println(result);
-		return result;
-	}
+//	//TODO meter esto en el objeto de MEtaDAta que ya existe
+//	private String fileNameFromPart(String fileName) {
+//		// Luther.S02E01.720p.HDTV.x264-3.mp4-67108864-67108864.part
+//		String[] splittedFileName = fileName.split("-");
+//		String result = StringUtils.EMPTY;
+//		int pieces = splittedFileName.length-2;
+//		for(int i=0; i<pieces; i++) {
+//			result +=splittedFileName[i]+"-";
+//		}
+//		result = result.substring(0, result.length()-1);
+//		System.out.println(result);
+//		return result;
+//	}
 
 	public String registerUser(User user) {
 		//add/{nombre}/{email}/{ip}/{port}
