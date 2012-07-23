@@ -38,7 +38,7 @@ public class H264Encoder implements Encoder {
 		this.fileName = fileName;
 		this.originDir = originDir;
 		this.targetDir = targetDir;
-		this.tempDir = new File(originDir + "_TEMP_ENCODING_" + fileName);
+		this.tempDir = new File(originDir + "/_TEMP_ENCODING_" + fileName);
 		this.buffer = new File(tempDir + "_SAFE_TO_DELETE_ANYTIME.garbage");
 
 		File origin = new File(originDir, fileName);
@@ -55,14 +55,13 @@ public class H264Encoder implements Encoder {
 	@Override
 	public File encode() {
 
-		String inFile = originDir + fileName;
+		String inFile = new File(originDir, fileName).getAbsolutePath();
 		String[] splittedFileName = fileName.split("\\.");
 		String extension = splittedFileName[splittedFileName.length - 1];
-		String tempFile = tempDir + fileName.replace(extension, tempExtension)
-				+ "." + targetExtension;
-		String outFile = targetDir
-				+ fileName.replace(extension, targetExtension);
-
+		String tempFile = new File(tempDir, fileName.replace(extension, tempExtension)
+				+ "." + targetExtension).getAbsolutePath();
+		String outFile = new File(targetDir, fileName.replace(extension, targetExtension)).getAbsolutePath(); 
+		
 		scanFile(inFile);
 
 		log.info("About to start encoding for inFile: " + inFile+" - buffer: " + buffer+" - outFile: " + outFile+" - videoBitRate: " + videoBitRate+" - videoHeight: " + videoHeight+" - audioCodec: " + audioCodec+" - audioBitRate: " + audioBitRate);
