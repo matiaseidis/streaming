@@ -37,7 +37,7 @@ public class H264EncoderTest {
 		assertTrue("Encoded file does not exist", encodedFile.exists());
 		assertTrue("Origin file should still exist at this point", originFile.exists());
 
-		assertEquals("Origin and target file ahould have same name", encodedFile.getName(), originFile.getName());
+		assertEquals("Origin and target file ahould have same name (without extensions)", encodedFile.getName().substring(0, encodedFile.getName().length()-3), originFile.getName().substring(0, originFile.getName().length()-3));
 
 		String codecName = getCodecName(encodedFile);
 		assertEquals("CODEC_ID_H264", codecName);
