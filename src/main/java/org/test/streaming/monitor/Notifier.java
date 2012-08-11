@@ -99,20 +99,6 @@ public class Notifier {
 		return new IndexRequester(url).post(params);
 	}
 	
-//	//TODO meter esto en el objeto de MEtaDAta que ya existe
-//	private String fileNameFromPart(String fileName) {
-//		// Luther.S02E01.720p.HDTV.x264-3.mp4-67108864-67108864.part
-//		String[] splittedFileName = fileName.split("-");
-//		String result = StringUtils.EMPTY;
-//		int pieces = splittedFileName.length-2;
-//		for(int i=0; i<pieces; i++) {
-//			result +=splittedFileName[i]+"-";
-//		}
-//		result = result.substring(0, result.length()-1);
-//		System.out.println(result);
-//		return result;
-//	}
-
 	public String registerUser(User user) {
 		//add/{nombre}/{email}/{ip}/{port}
 		String url = conf.getNotifierUrl()+"user/add/"+user.getId()+"/"+user.getEmail()+"/"+user.getIp()+"/"+user.getPort();

@@ -17,7 +17,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 	private static int bufferSize = 256 * 256;
 	private String videoParam = "id";
-	
+
 	private static final long serialVersionUID = 1L;
 	private final static String contentTypeMP4 = "video/mp4";
 	byte[] headerMP4 = { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x14, (byte) 0x66, (byte) 0x74, (byte) 0x79, (byte) 0x70, (byte) 0x69, (byte) 0x73, (byte) 0x6F, (byte) 0x6D };
@@ -25,11 +25,11 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		Conf conf = new Conf();
 		String videoId = request.getParameter(videoParam);
-		if(videoId == null) {
+		if (videoId == null) {
 			videoId = conf.get("test.video.file.name");
 		}
 		request.getSession().getServletContext().setAttribute(videoParam, videoId);
-		
+
 		try {
 			downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
 		} catch (Exception e) {
@@ -53,7 +53,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 			OutputStream os = response.getOutputStream();
 
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os, new ProgressLogger());
 
 			os.flush();
 			os.close();
@@ -123,7 +123,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			// is.skip((long) start);
 			// System.out.println("Demo.downloadFile()");
 			// }
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan("esto no se usa mas", null), os);
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan("esto no se usa mas", null), os, new ProgressLogger());
 
 			os.flush();
 			os.close();

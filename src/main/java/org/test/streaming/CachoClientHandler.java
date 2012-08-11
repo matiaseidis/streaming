@@ -1,14 +1,10 @@
 package org.test.streaming;
 
-import java.io.OutputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 public class CachoClientHandler extends SimpleChannelHandler {
@@ -23,6 +19,13 @@ public class CachoClientHandler extends SimpleChannelHandler {
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		e.getChannel().write(this.getCachoRequest());
 		log.debug("Cacho " + this.getCachoRequest() + " requested.");
+	}
+
+	@Override
+	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		// TODO El server cerro la conexion, no mas bytes disponibles para este
+		// cacho, habria que disparar un mecanismo de busqueda de los bytes que
+		// faltan.
 	}
 
 	@Override

@@ -20,13 +20,14 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 	}
 
 	@Override
-	public void interpret(MovieRetrievalPlan plan, OutputStream out) {
+	public void interpret(MovieRetrievalPlan plan, OutputStream out, StreamingProgressObserver progressObserver) {
 		List<CachoRetrieval> requests = plan.getRequests();
 		final List<CachoStreamer> streamers = new LinkedList<CachoStreamer>();
 		List<Runnable> tasks = new LinkedList<Runnable>();
 		final CountDownLatch streamFinishedLatch = new CountDownLatch(1);
 		CachoRetrieval firstCacho = requests.get(0);
 		final CachoRequester cachoRequester = new CachoRequester(firstCacho.getHost(), firstCacho.getPort());
+		cachoRequester.setProgressObserver(progressObserver);
 		final CachoRequest request = firstCacho.getRequest();
 		final DirectCachoStreamer firstStreamer = new DirectCachoStreamer(this.getShareDir(), out, request.getLength(), this.createPartFile(request), new OnCachoComplete() {
 
@@ -85,6 +86,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 				e.printStackTrace();
 			}
 		}
+		cachoRequester.getProgressObserver().done(cachoRequester.getProgress());
 		log.debug("Downloading finished, still streaming...");
 		try {
 			streamFinishedLatch.await();

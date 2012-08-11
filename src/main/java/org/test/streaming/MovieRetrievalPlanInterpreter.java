@@ -4,6 +4,6 @@ import java.io.OutputStream;
 
 public interface MovieRetrievalPlanInterpreter {
 
-	public void interpret(MovieRetrievalPlan plan, OutputStream out);
+	public void interpret(MovieRetrievalPlan plan, OutputStream out, StreamingProgressObserver progressObserver);
 
 }

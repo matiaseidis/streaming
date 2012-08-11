@@ -1,6 +1,9 @@
 package org.test.streaming;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -52,6 +55,34 @@ public class CachoPusher {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+
+	}
+
+	public static void main(String[] args) {
+		if (args.length != 5) {
+			System.out.println("CachoPusher movieFileName zeroBasedFirstByteIndex amountOfBytes remoteHost remotePort");
+			System.exit(0);
+		}
+		String movieFileName = args[0];
+		String firstBteArg = args[1];
+		String lengthArg = args[2];
+		String host = args[3];
+		String portArg = args[4];
+		File file = new File(movieFileName);
+		try {
+			int firstByte = Integer.parseInt(firstBteArg);
+			int length = Integer.parseInt(lengthArg);
+			int port = Integer.parseInt(portArg);
+			FileInputStream fileInputStream = new FileInputStream(file);
+
+			new CachoPusher(host, port).push(fileInputStream, movieFileName, firstByte, length);
+		} catch (NumberFormatException e) {
+			System.out.println("CachoPusher movieFileName zeroBasedFirstByteIndex amountOfBytes");
+			System.exit(0);
+		} catch (FileNotFoundException e) {
+			System.err.println("File " + movieFileName + " does not exists.");
+			System.exit(0);
 		}
 
 	}
