@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class CachoRequest implements Serializable {
+public class CachoRequest implements Serializable, Comparable<CachoRequest> {
 
 	private String movieId;
 	private String fileName;
@@ -69,6 +69,11 @@ public class CachoRequest implements Serializable {
 
 	public void setDirection(CachoDirection direction) {
 		this.direction = direction;
+	}
+
+	@Override
+	public int compareTo(CachoRequest o) {
+		return this.getFirstByteIndex() - o.getFirstByteIndex();
 	}
 
 }

@@ -27,7 +27,7 @@ public class CachoPusherTest {
 		new DefaultMovieSharingPlanInterpreter(conf).interpret(new DummyMovieRetrievalPlan("videoId", conf));
 		Thread.sleep(10000);
 		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
-		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos);
+		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos, new ProgressLogger());
 		baos.flush();
 		baos.close();
 

@@ -27,7 +27,7 @@ public class CachoRequesterTest {
 	public void testStream() throws Exception {
 		Conf conf = new Conf("/alt-test-conf.properties");
 		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
-		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos);
+		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos, new ProgressLogger());
 		baos.flush();
 		baos.close();
 		File streamedData = new File("sandonga1.mp4");
@@ -110,9 +110,9 @@ public class CachoRequesterTest {
 
 	private void streamTo(Conf conf, String streamedOutputFileName) throws FileNotFoundException, IOException {
 		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File(streamedOutputFileName)));
-		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos);
+		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos, new ProgressLogger());
 		baos.flush();
 		baos.close();
 	}
-	
+
 }
