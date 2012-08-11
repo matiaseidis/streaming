@@ -26,6 +26,13 @@ public class CachoClientHandler extends SimpleChannelHandler {
 	}
 
 	@Override
+	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		// TODO El server cerro la conexion, no mas bytes disponibles para este
+		// cacho, habria que disparar un mecanismo de busqueda de los bytes que
+		// faltan.
+	}
+
+	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		log.error("Exception downloading cacho " + this.getCachoRequest(), e.getCause());
 		if (ctx.getChannel().isOpen()) {

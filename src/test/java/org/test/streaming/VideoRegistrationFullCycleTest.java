@@ -1,4 +1,4 @@
-package org.test.streaming;
+	package org.test.streaming;
 
 import java.io.File;
 import java.util.Collection;
