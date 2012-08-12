@@ -28,7 +28,7 @@ public class H264EncoderTest {
 		File originFile = new File(conf.getSharedDir(), videoFilename);
 
 		assertNotNull("Origin file not setted correcly: "+videoFilename, originFile);
-		assertTrue("Origin file does not exist "+videoFilename, originFile.exists());
+		assertTrue("Origin file "+originFile.getAbsolutePath()+"does not exist "+videoFilename, originFile.exists());
 
 		H264Encoder encoder = new H264Encoder(videoFilename, conf.getSharedDir(), conf.getCachosDir());
 
