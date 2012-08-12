@@ -12,9 +12,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Hasher {
+public class ChunkHasher {
 
-	protected static final Log log = LogFactory.getLog(Hasher.class);
+	protected static final Log log = LogFactory.getLog(ChunkHasher.class);
+	int chunkSize = 1024*1024;
 
 
 
@@ -34,7 +35,7 @@ public class Hasher {
 		}
 		md.reset();
 
-		byte[] bytes = new byte[1024];
+		byte[] bytes = new byte[chunkSize];
 		try {
 			FileInputStream fis = new FileInputStream(file);
 			fis.skip(nextChunkFirstByteIndex - cachoFirstByteIndex);
@@ -60,7 +61,9 @@ public class Hasher {
 		while(hashtext.length() < 32 ){
 			hashtext = "0"+hashtext;
 		}
-		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex);
+		
+		long endByte = nextChunkFirstByteIndex + chunkSize > file.length() ? file.length() : nextChunkFirstByteIndex + chunkSize;
+		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex +" to " + endByte);
 		return hashtext;
 	}
 	

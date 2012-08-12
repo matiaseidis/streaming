@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
-import org.test.streaming.Hasher;
+import org.test.streaming.ChunkHasher;
 
 import com.google.gson.Gson;
 
@@ -15,7 +15,7 @@ public class VideoRegistration implements Registration{
 
 	protected static final Log log = LogFactory.getLog(VideoRegistration.class);
 	private final File video;
-	private final Hasher hasher;
+	private final ChunkHasher hasher;
 	int indexableSize;
 	private final Notifier notifier;
 	private Conf conf;
@@ -23,7 +23,7 @@ public class VideoRegistration implements Registration{
 	
 	public VideoRegistration(File video, Conf conf){
 		this.video = video;
-		this.hasher = new Hasher();
+		this.hasher = new ChunkHasher();
 		this.conf = conf;
 		notifier = new Notifier(conf);
 		this.indexableSize = conf.getIndexableSize();

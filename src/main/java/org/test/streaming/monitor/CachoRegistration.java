@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
-import org.test.streaming.Hasher;
+import org.test.streaming.ChunkHasher;
 import org.test.streaming.MovieCachoFile;
 import org.test.streaming.MovieCachoHasher;
 
@@ -46,7 +46,12 @@ public class CachoRegistration implements Registration{
 		
 		int cachoFirstByteIndex = movieCachoFile.getCacho().getFirstByteIndex();
 		int cachoLenght = movieCachoFile.getCacho().getLength();
-		int nextChunkFirstByteIndex = cachoFirstByteIndex % indexableSize == 0 ? cachoFirstByteIndex : cachoFirstByteIndex + indexableSize;
+		
+		int resto = cachoFirstByteIndex % indexableSize;
+		int nextChunkFirstByteIndex = resto == 0 
+						? cachoFirstByteIndex 
+						: cachoFirstByteIndex + resto;
+		
 		int totalChunks = (cachoLenght - (nextChunkFirstByteIndex - cachoFirstByteIndex)) / indexableSize;
 		
 		
