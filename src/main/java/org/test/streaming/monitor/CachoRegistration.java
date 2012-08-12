@@ -41,7 +41,7 @@ public class CachoRegistration implements Registration{
 	public RegistrationResponse register() {
 		
 		String fileName = movieCachoFile.getMovieFile().getName();
-		String chunks = chunkEncoder.encodeChunks(chunksToRegiter);
+		String chunks = chunkEncoder.encodeCacho(chunksToRegiter);
 		
 		String registrationResponse  = notifier.registerChunks(fileName, this.getUserId(), chunks);
 		log.info("Sended by Chasqui to remote repo <fileName: "+fileName+" - chunks: "+chunks+"]> - "+chunksToRegiter.size()+" fragmentos de "+indexableSize+" reportados");

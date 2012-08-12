@@ -66,24 +66,5 @@ public class ChunkHasher {
 		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex +" to " + endByte);
 		return hashtext;
 	}
-	
-	public String encodeChunksForRegistration(File file, int totalChunks,
-			int nextChunkFirstByteIndex, int indexableSize) {
-		/*
-		 * partes de tamaño <indexableSize> bytes en la que indexo este cacho
-		 */
-		StringBuilder sb = new StringBuilder();
 
-		for(int i = 0; i < totalChunks; i++){
-
-			String chunkId = this.hashCacho(file, nextChunkFirstByteIndex, 0); 
-
-			log.info("oridinal: " + i + "id: "+ chunkId);
-			sb.append(chunkId+"!");
-			nextChunkFirstByteIndex += indexableSize;
-		}
-
-		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
-		return sb.toString();
-	}
 }

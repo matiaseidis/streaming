@@ -66,11 +66,11 @@ public class VideoRegistrationFullCycleTest {
 		User otroUser = new User("otro-user-test", "otro-user@test.com", "1.1.1.1", "8080");
 		UserRegistration otherUserRegistration = new UserRegistration(otroUser, conf);
 		otherUserRegistration.go();
-		int cachoLenght = 1024*1024;
+		int chunkLenght = 1024*1024;
 		
 		
-		MovieCachoFile movieCachoFile = new MovieCachoFile(new MovieCacho(0,cachoLenght), video);
-		CachoRegistration cachoRegistration = new CachoRegistration(movieCachoFile, conf);
+		MovieCachoFile movieCachoFile = new MovieCachoFile(new MovieCacho(0,chunkLenght), video);
+		CachoRegistration cachoRegistration = new CachoRegistration(conf, movieCachoFile, new MovieCachoHasher().hashMovieCachoFile(movieCachoFile, chunkLenght));
 		
 		cachoRegistration.setUserId(otroUser.getId());
 		
@@ -110,7 +110,7 @@ public class VideoRegistrationFullCycleTest {
 			
 		});
 
-		Assert.assertTrue(lenghts.contains(cachoLenght));
-		Assert.assertTrue(lenghts.contains(((int)video.length() - cachoLenght)));
+		Assert.assertTrue(lenghts.contains(chunkLenght));
+		Assert.assertTrue(lenghts.contains(((int)video.length() - chunkLenght)));
 	}
 }
