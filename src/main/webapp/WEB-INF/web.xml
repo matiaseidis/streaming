@@ -8,6 +8,10 @@
 	<listener>
 		<listener-class>org.test.streaming.listener.SharedVideosListener</listener-class>
 	</listener>
+	
+	<listener>
+		<listener-class>org.test.streaming.listener.DimonStarterListener</listener-class>
+	</listener>
 
 	<servlet>
 		<servlet-name>s</servlet-name>

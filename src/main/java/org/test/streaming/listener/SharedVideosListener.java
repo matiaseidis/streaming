@@ -6,7 +6,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.Conf;
-import org.test.streaming.Dimon;
 import org.test.streaming.monitor.SharedVideosMonitor;
 
 public class SharedVideosListener implements ServletContextListener {
@@ -26,11 +25,6 @@ public class SharedVideosListener implements ServletContextListener {
 			System.exit(1);
 		}
 		sce.getServletContext().setAttribute(key, sharedVideoMonitor);
-		
-		/*
-		 * start dimon
-		 */
-		new Dimon(conf.getDaemonPort()).run();
 	}
 
 	@Override

@@ -41,6 +41,12 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 		bootstrap.bind(new InetSocketAddress(port));
 		log.info("Dimon is ready, awaiting for Cacho requests...");
 	}
+	
+	public void stop(){
+		/*
+		 * TODO
+		 */
+	}
 
 	public static void main(String[] args) throws Exception {
 		int port;

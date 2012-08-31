@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.test.streaming.CachoRequest;
@@ -31,7 +30,7 @@ public class Notifier {
 	
 	public List<String> listChunks(String videoId){
 		
-		String response = new IndexRequester(conf.getNotifierUrl()+"video/getChunks/"+videoId+"/"+conf.get("test.user.id")).get();
+		String response = new IndexRequester(conf.getNotifierUrl()+"VideoService/getChunks/"+videoId+"/"+conf.get("test.user.id")).get();
 		@SuppressWarnings("unchecked")
 		List<String> chunkIds = new Gson().fromJson(response, List.class);
 		return chunkIds;  	
@@ -39,21 +38,30 @@ public class Notifier {
 
 	public String listVideos(String videoId){
 		
-		return new IndexRequester("video/list").get();	
+		return new IndexRequester("VideoService/list").get();	
 	}
 
 	public MovieRetrievalPlan getRetrievalPlan(String videoId, String userId){
 
-		String rp = new IndexRequester(conf.getNotifierUrl()+"plan/"+videoId+"/"+userId).get();
+		String url = conf.getNotifierUrl()+"planservice/getRetrievalPlan?videoId="+videoId+"&userId="+userId;
+		String rp = new IndexRequester(url).get();
+		
+		log.info("retrieval plan response at <"+url+">: "+rp);
 		
 		LinkedHashMap json = new Gson().fromJson(rp, LinkedHashMap.class);
+		
+		log.info("JSON: "+json.toString());
 
 		String fileName = ((StringMap)((StringMap)json.get("body")).get("video")).get("fileName").toString();
 		
 		/*
 		 * viene otro videoId del indice
 		 */
-		String id = ((StringMap)((StringMap)json.get("body")).get("video")).get("id").toString();
+		log.info("-------------");
+		log.info(((StringMap)json.get("body")).toString());
+		log.info("-------------");
+		String id = ((StringMap)((StringMap)json.get("body")).get("video")).get("videoId").toString();
+		log.info(id);
 		if (!videoId.equals(id)) {
 			throw new RuntimeException("no  puede pasar esto");
 		}
@@ -85,23 +93,32 @@ public class Notifier {
 	}
 
 	public String registerChunks(String fileName, String userId, String chunks) {
-		String url = conf.getNotifierUrl()+"video/registerChunks/"+fileName+"/"+userId+"/"+chunks;
+		String url = conf.getNotifierUrl()+"VideoService/registerChunks/"+fileName+"/"+userId+"/"+chunks;
 		return new IndexRequester(url).post(null);	
 	}
 
 	public String registerVideo(String videoId, String fileName, long lenght, String chunks) {
 
 		//register/{videoId}/{fileName}/{lenght}/{chunks}/{userId}", method = RequestMethod.POST)
-		String url = conf.getNotifierUrl()+"video/register/"+videoId+"/"+fileName+"/"+lenght+"/"+conf.get("test.user.id");
+		
+//		 registerVideo(@NotNull String videoId, @NotNull  String fileName, @NotNull Long lenght, @NotNull String userId, @NotNull String chunks){
+				
+//		String url = conf.getNotifierUrl()+"VideoService/registerVideo/"+videoId+"/"+fileName+"/"+lenght+"/"+conf.get("test.user.id")+"/"+chunks;
+		String url = conf.getNotifierUrl()+"videoService/registerVideo";
 		Map<String, String> params = new HashMap<String, String>();
+		params.put("videoId", videoId);
+		params.put("fileName", fileName);
+		params.put("lenght", Long.toString(lenght));
 		params.put("chunks", chunks);
+		params.put("userId", conf.get("test.user.id"));
 		
 		return new IndexRequester(url).post(params);
+//		return new IndexRequester(url).get();
 	}
 	
 	public String registerUser(User user) {
 		//add/{nombre}/{email}/{ip}/{port}
-		String url = conf.getNotifierUrl()+"user/add/"+user.getId()+"/"+user.getEmail()+"/"+user.getIp()+"/"+user.getPort();
+		String url = conf.getNotifierUrl()+"UserService/add/"+user.getId()+"/"+user.getEmail()+"/"+user.getIp()+"/"+user.getPort();
 		return new IndexRequester(url).post(null);	
 		
 	}

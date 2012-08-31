@@ -25,9 +25,12 @@ public class VideoRegistrationFullCycleTest {
 	@Test
 	public void testRestrievalPlan(){
 
-		Conf conf = new Conf();
+		Conf conf = new Conf("/alt-test-conf.properties");
 		String videoFileName = conf.get("test.video.file.name");
 		File video = new File(conf.getCachosDir(), videoFileName);
+		
+		Assert.assertTrue("file: "+video.getAbsolutePath()+" does not exist", video.exists());
+		
 		Notifier notifier = new Notifier(conf);
 
 		/*
@@ -56,7 +59,7 @@ public class VideoRegistrationFullCycleTest {
 		Assert.assertEquals(retrievalPlan.getRequests().size(), 1);
 		Assert.assertEquals(retrievalPlan.getRequests().get(0).getHost(), user.getIp());
 		Assert.assertEquals(retrievalPlan.getVideoId(), videoRegistrationResponse.getId());
-		Assert.assertEquals(retrievalPlan.getRequests().get(0).getRequest().getLength(), video.length());
+		Assert.assertEquals(video.length(), retrievalPlan.getRequests().get(0).getRequest().getLength());
 		
 		/*
 		 * registro otro usuario

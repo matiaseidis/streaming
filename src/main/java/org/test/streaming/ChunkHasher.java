@@ -62,7 +62,13 @@ public class ChunkHasher {
 			hashtext = "0"+hashtext;
 		}
 		
-		long endByte = nextChunkFirstByteIndex + chunkSize > file.length() ? file.length() : nextChunkFirstByteIndex + chunkSize;
+		long endByte = 0;
+		
+		if(fullVideoId){
+			endByte = file.length();
+		} else {
+			endByte = nextChunkFirstByteIndex + chunkSize > file.length() ? file.length() : nextChunkFirstByteIndex + chunkSize - 1;
+		}
 		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex +" to " + endByte);
 		return hashtext;
 	}

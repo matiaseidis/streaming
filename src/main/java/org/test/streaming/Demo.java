@@ -2,18 +2,19 @@ package org.test.streaming;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.test.streaming.monitor.Notifier;
+
 public class Demo extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
 
-	// private static final double MegabitsPerSec = 9;
-	// private static final double KbitsPerSec = MegabitsPerSec * 1000;
+	protected static final Log log = LogFactory.getLog(Demo.class);
 
 	private static int bufferSize = 256 * 256;
 	private String videoParam = "id";
@@ -25,16 +26,69 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		Conf conf = new Conf();
 		String videoId = request.getParameter(videoParam);
+		
 		if (videoId == null) {
 			videoId = conf.get("test.video.file.name");
 		}
+		
+		log.info("Empezando en el servle para video id: " + videoId);
+		
 		request.getSession().getServletContext().setAttribute(videoParam, videoId);
 
 		try {
-			downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
+			downloadFilePosta(response, videoId, conf);
+//			downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void downloadFilePosta(HttpServletResponse response,
+			String videoId, Conf conf) {
+		try {
+			
+			
+			
+			WatchMovieRetrievalPlan retrievalPlan = (WatchMovieRetrievalPlan)new Notifier(conf).getRetrievalPlan(videoId, conf.get("test.user.id"));
+			retrievalPlan.getRequests().get(0).setPort(conf.getDaemonPort());
+			log.info("------------------ RP --------------------------");
+			log.info("retrievalPlan.getVideoId(): "+retrievalPlan.getVideoId());
+			log.info("retrievalPlan.getRequests().size(): "+retrievalPlan.getRequests().size());
+			log.info("retrievalPlan.getRequests().get(0).getHost(): "+retrievalPlan.getRequests().get(0).getHost());
+			log.info("retrievalPlan.getRequests().get(0).getPort(): "+retrievalPlan.getRequests().get(0).getPort());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getDirection(): "+retrievalPlan.getRequests().get(0).getRequest().getDirection());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getFileName(): "+retrievalPlan.getRequests().get(0).getRequest().getFileName());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getFirstByteIndex(): "+retrievalPlan.getRequests().get(0).getRequest().getFirstByteIndex());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getLength(): "+retrievalPlan.getRequests().get(0).getRequest().getLength());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getMovieId(): "+retrievalPlan.getRequests().get(0).getRequest().getMovieId());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getCacho().getFirstByteIndex(): "+retrievalPlan.getRequests().get(0).getRequest().getCacho().getFirstByteIndex());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getCacho().getLastByteIndex(): "+retrievalPlan.getRequests().get(0).getRequest().getCacho().getLastByteIndex());
+			log.info("retrievalPlan.getRequests().get(0).getRequest().getCacho().getLength(): "+retrievalPlan.getRequests().get(0).getRequest().getCacho().getLength());
+			
+			log.info(conf.getSharedDir().getAbsolutePath());
+			log.info(conf.getTempDir().getAbsolutePath());
+			
+			
+			response.setBufferSize(bufferSize);
+			response.setContentType(contentTypeMP4);
+			//TODO agregar el tamaño del video al plan
+			response.setContentLength(retrievalPlan.getRequests().get(0).getRequest().getCacho().getLength());
+			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
+
+			response.flushBuffer();
+
+			OutputStream os = response.getOutputStream();
+			
+			
+
+			new DefaultMovieRetrievalPlanInterpreter(conf.getSharedDir(), conf.getTempDir()).interpret(retrievalPlan, os, new ProgressLogger());
+
+			os.flush();
+			os.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -62,256 +116,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		}
 	}
 
-	// public void createParts() throws Exception {
-	// String name = "./a.mp4";
-	// InputStream is = new FileInputStream(name);
-	// int part = 0;
-	// OutputStream ous = new FileOutputStream(newPartFile(name, 0));
-	//
-	// int b = 0;
-	// int count = 0;
-	// try {
-	// while ((b = is.read()) != -1) {
-	// count++;
-	// ous.write(b);
-	// if (count == 2048 * 1024) {
-	// ous.close();
-	// part++;
-	// File file = newPartFile(name, part);
-	// ous = new FileOutputStream(file);
-	// count = 0;
-	// }
-	// }
-	// ous.close();
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// }
+	
 
-	// private static File newPartFile(String name, int part) {
-	// File file = new File(name + ".part." + part);
-	// return file;
-	// }
 
-	public void downloadFile(HttpServletResponse response, String id, String name, int start) throws Exception {
-		InputStream is = null;
-
-		try {
-			// String pathname = Upload.targetDir + name;
-			// File fdesc = new File(pathname);
-
-			response.setBufferSize(bufferSize);
-			response.setContentType(contentTypeMP4);
-			int videoSize = Integer.parseInt(new Conf().get("test.video.file.size"));
-			response.setContentLength(videoSize);
-			response.addHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("videoDemo", "UTF-8"));
-
-			response.flushBuffer();
-
-			OutputStream os = response.getOutputStream();
-			// is = createStream(fdesc);
-			// int read = 0;
-			// byte[] headerFLV = new byte[] { (byte) 0x46, (byte) 0x4C, (byte)
-			// 0x56, (byte) 0x01, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte)
-			// 0x00, (byte) 0x09, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte)
-			// 0x09 };
-
-			os.write(headerMP4);
-			// if (start > 0) {
-			// is.skip((long) start);
-			// System.out.println("Demo.downloadFile()");
-			// }
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan("esto no se usa mas", null), os, new ProgressLogger());
-
-			os.flush();
-			os.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		//
-		// try {
-		// if (is != null)
-		// is.close();
-		// } catch (Exception ex) {
-		// ex.printStackTrace();
-		// }
-
-	}
-
-	// private static InputStream createStream(File fdesc) throws
-	// FileNotFoundException {
-	// final List<FileInputStream> parts = parts(fdesc);
-	//
-	// System.err.println(parts.size());
-	// return new InputStream() {
-	//
-	// InputStream current;
-	// int count = 0;
-	//
-	// @Override
-	// public int read() throws IOException {
-	// if (current == null) {
-	// current = parts.get(0);
-	// if (current == null) {
-	// System.out.println("no esta la sandonga");
-	//
-	// }
-	// }
-	// int read = readByte();
-	// if (read == -1) {
-	// System.out.println("listo " + parts.indexOf(current));
-	// int currentIndex = parts.indexOf(current);
-	// if (parts.size() == currentIndex + 1) {
-	// read = -1;
-	// System.out.println("listo");
-	// } else {
-	// current = parts.get(currentIndex + 1);
-	// read = readByte();
-	// }
-	// }
-	// return read;
-	// }
-	//
-	// double BytesPerSec = KbitsPerSec * 1000 / 8;
-	// double BytesPerMili = BytesPerSec / 1000;
-	// double transferCostFactor = 2;
-	//
-	// private int readByte() throws IOException {
-	// int read = current.read();
-	// count++;
-	// if (count >= BytesPerMili * transferCostFactor) {
-	// try {
-	// Thread.sleep(1);
-	// } catch (InterruptedException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// count = 0;
-	// }
-	// return read;
-	// }
-	// };
-	// }
-
-	// private static int length(File fdesc) throws FileNotFoundException {
-	// int length = 0;
-	// String name = fdesc.getAbsolutePath();
-	// File partFile = newPartFile(name, 0);
-	// for (int part = 1; partFile.exists(); part++) {
-	// length += partFile.length();
-	// partFile = newPartFile(name, part);
-	//
-	// }
-	// return length;
-	// }
-	//
-	// private static List<FileInputStream> parts(File fdesc) throws
-	// FileNotFoundException {
-	// final List<FileInputStream> parts = new LinkedList<FileInputStream>();
-	// String name = fdesc.getAbsolutePath();
-	// File partFile = newPartFile(name, 0);
-	// for (int part = 1; partFile.exists(); part++) {
-	// parts.add(new FileInputStream(partFile));
-	// partFile = newPartFile(name, part);
-	// }
-	// return parts;
-	// }
-
-	// private static File newPartFile(String name, int part) {
-	// File file = new File(name + ".part." + part);
-	// return file;
-	// }
-
-	// private static InputStream createStream(File fdesc) throws
-	// FileNotFoundException {
-	// final List<FileInputStream> parts = parts(fdesc);
-	//
-	// System.err.println(parts.size());
-	// return new InputStream() {
-	//
-	// InputStream current;
-	// int count = 0;
-	//
-	// @Override
-	// public int read() throws IOException {
-	// if (current == null) {
-	// current = parts.get(0);
-	// if (current == null) {
-	// System.out.println("no esta la sandonga");
-	//
-	// }
-	// }
-	// int read = readByte();
-	// if (read == -1) {
-	// System.out.println("listo " + parts.indexOf(current));
-	// int currentIndex = parts.indexOf(current);
-	// if (parts.size() == currentIndex + 1) {
-	// read = -1;
-	// System.out.println("listo");
-	// } else {
-	// current = parts.get(currentIndex + 1);
-	// read = readByte();
-	// }
-	// }
-	// return read;
-	// }
-	//
-	// double BytesPerSec = KbitsPerSec * 1000 / 8;
-	// double BytesPerMili = BytesPerSec / 1000;
-	// double transferCostFactor = 2;
-	//
-	// private int readByte() throws IOException {
-	// int read = current.read();
-	// count++;
-	// if (count >= BytesPerMili * transferCostFactor) {
-	// try {
-	// Thread.sleep(1);
-	// } catch (InterruptedException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// count = 0;
-	// }
-	// return read;
-	// }
-	// };
-	// }
-
-	// private static int length(File fdesc) throws FileNotFoundException {
-	// int length = 0;
-	// String name = fdesc.getAbsolutePath();
-	// File partFile = newPartFile(name, 0);
-	// for (int part = 1; partFile.exists(); part++) {
-	// length += partFile.length();
-	// partFile = newPartFile(name, part);
-	//
-	// }
-	// return length;
-	// }
-
-	// private static List<FileInputStream> parts(File fdesc) throws
-	// FileNotFoundException {
-	// final List<FileInputStream> parts = new LinkedList<FileInputStream>();
-	// String name = fdesc.getAbsolutePath();
-	// File partFile = newPartFile(name, 0);
-	// for (int part = 1; partFile.exists(); part++) {
-	// parts.add(new FileInputStream(partFile));
-	// partFile = newPartFile(name, part);
-	// }
-	// return parts;
-	// }
-
-	// public static void main(String[] args) throws Exception{
-	// Server server = new Server(Integer.valueOf(System.getenv("PORT")));
-	// ServletContextHandler context = new
-	// ServletContextHandler(ServletContextHandler.SESSIONS);
-	// context.setContextPath("/");
-	// server.setHandler(context);
-	// context.addServlet(new ServletHolder(new Demo()),"/demo");
-	// context.addServlet(new ServletHolder(new Upload()),"/upload");
-	// server.start();
-	// server.join();
-	// }
 }

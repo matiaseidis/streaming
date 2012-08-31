@@ -45,35 +45,49 @@ public class IndexRequester {
 
 	public String post(Map<String, String> params) {
 
-		String response = null;
-		
+		StringBuilder response = new StringBuilder();
+
 		if(params == null) {
 			params = new HashMap<String, String>();
 		}
 
-		try{
-			URL url = new URL(urlString);
-			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
-
-			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-			String param;
-			for(Map.Entry<String, String> entry : params.entrySet()){
-				param = URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + entry.getValue();
-				wr.write(param);
+		try {
+		    // Construct data
+			String data = "";
+			for(Map.Entry<String,String> param: params.entrySet()){
+//				data += "&" + URLEncoder.encode(param.getKey(), "UTF-8") + "=" + URLEncoder.encode(param.getValue(), "UTF-8");
+				data += "&" + param.getKey() + "=" + param.getValue();
+				
 			}
-			wr.flush();
-			response = getResponse(conn);
-			wr.close();
+			data = data.substring(1);
+		    System.out.println(data);
 
+		    // Send data
+		    URL url = new URL(urlString);
+		    URLConnection conn = url.openConnection();
+		    conn.setDoOutput(true);
+		    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+		    wr.write(data);
+		    wr.flush();
+
+		    // Get the response
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    String line;
+		    while ((line = rd.readLine()) != null) {
+		        response.append(line);
+		    }
+		    wr.close();
+		    rd.close();
 		} catch (Exception e) {
 			log.error("Unable to perform request", e);
 		}
-		return response;
+		String resp = response.toString();
+		log.info(resp);
+		return resp;
 	}
 	
 	private String getResponse(URLConnection conn) throws IOException {
-
+	
 		String line= null;
 		StringBuilder sb = new StringBuilder();
 		// Get the response

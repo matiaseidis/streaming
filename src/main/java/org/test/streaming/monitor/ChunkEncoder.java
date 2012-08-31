@@ -13,7 +13,7 @@ public class ChunkEncoder {
 	public String encodeCacho(Map<Integer, String> chunksToRegiter) {
 		StringBuilder sb = new StringBuilder();
 		for(Map.Entry<Integer,String> entry : chunksToRegiter.entrySet()){
-				sb.append(entry.getKey()+"!"+entry.getValue()+"&");
+				sb.append(entry.getKey()+"_"+entry.getValue()+"-");
 		}
 		if(sb.length()>1)
 			sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
@@ -30,7 +30,7 @@ public class ChunkEncoder {
 		for(Map.Entry<Integer, String> chunkEntry : chunks.entrySet() ) {
 			
 			log.info("oridinal: " + chunkEntry.getKey() + "id: "+ chunkEntry.getValue());
-			sb.append(chunkEntry.getValue()+"!");
+			sb.append(chunkEntry.getValue()+"_");
 		}
 		
 		sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
