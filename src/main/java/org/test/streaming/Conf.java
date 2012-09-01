@@ -23,6 +23,7 @@ public class Conf {
 	private String monitorInterval = "monitor.interval";
 	private String daemonHost = "dimon.host";
 	private String daemonPort = "dimon.port";
+	private String sharingEnabled = "file.sharing.enabled";
 
 	private Properties properties;
 
@@ -117,6 +118,10 @@ public class Conf {
 
 	protected File getUserHomeDir() {
 		return new File(System.getProperty("user.home"));
+	}
+
+	public boolean isSharingEnabled() {
+		return Boolean.getBoolean(get(sharingEnabled));
 	}
 
 }

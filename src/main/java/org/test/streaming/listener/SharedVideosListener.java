@@ -16,6 +16,11 @@ public class SharedVideosListener implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		Conf conf = new Conf();
+		
+		if(!conf.isSharingEnabled()){
+			return;
+		}
+		
 		SharedVideosMonitor sharedVideoMonitor = new SharedVideosMonitor(conf);
 		
 		try {
@@ -29,8 +34,12 @@ public class SharedVideosListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
+		
 		SharedVideosMonitor sharedVideoMonitor = (SharedVideosMonitor)sce.getServletContext().getAttribute(key);
-		sharedVideoMonitor.end();
+
+		if(sharedVideoMonitor != null){
+			sharedVideoMonitor.end();
+		}
 	}
 
 }
