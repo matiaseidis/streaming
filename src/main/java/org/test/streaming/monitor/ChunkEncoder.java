@@ -21,6 +21,17 @@ public class ChunkEncoder {
 		return sb.toString();
 	}
 	
+	public String encodeVideoChunks(Map<Integer, String> chunksToRegiter) {
+		StringBuilder sb = new StringBuilder();
+		for(Map.Entry<Integer,String> entry : chunksToRegiter.entrySet()){
+				sb.append(entry.getValue()+"-");
+		}
+		if(sb.length()>1)
+			sb.replace(sb.length()-1, sb.length(), StringUtils.EMPTY);
+		
+		return sb.toString();
+	}
+	
 	private String encodeVideo(Map<Integer, String> chunks) {
 		/*
 		 * partes de tamaño <indexableSize> bytes en la que indexo este cacho

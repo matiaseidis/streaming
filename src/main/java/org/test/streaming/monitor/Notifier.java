@@ -53,6 +53,7 @@ public class Notifier {
 		log.info("JSON: "+json.toString());
 
 		String fileName = ((StringMap)((StringMap)json.get("body")).get("video")).get("fileName").toString();
+		String videoLenght = ((StringMap)((StringMap)json.get("body")).get("video")).get("lenght").toString();
 		
 		/*
 		 * viene otro videoId del indice
@@ -66,7 +67,8 @@ public class Notifier {
 			throw new RuntimeException("no  puede pasar esto");
 		}
 
-		WatchMovieRetrievalPlan retrievalPlan = new WatchMovieRetrievalPlan(videoId);
+		WatchMovieRetrievalPlan retrievalPlan = new WatchMovieRetrievalPlan(videoId	);
+		retrievalPlan.setVideoLenght(Double.valueOf(videoLenght).longValue());
 		ArrayList<StringMap> userCachos = ((ArrayList<StringMap>)((StringMap)json.get("body")).get("userCachos"));
 
 		for (StringMap userCacho : userCachos) {
@@ -83,7 +85,7 @@ public class Notifier {
 			
 			CachoRetrieval cachoRetrieval = new CachoRetrieval();
 			cachoRetrieval.setHost(userCachoUser.get("ip").toString());
-			cachoRetrieval.setPort(Integer.valueOf(userCachoUser.get("port").toString().split("\\.")[0].toString()));
+			cachoRetrieval.setPort(Integer.valueOf(userCachoUser.get("dimonPort").toString().split("\\.")[0].toString()));
 			cachoRetrieval.setRequest(cachoRequest);
 			
 			retrievalPlan.getRequests().add(cachoRetrieval);

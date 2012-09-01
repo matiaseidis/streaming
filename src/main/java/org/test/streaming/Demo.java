@@ -50,9 +50,10 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			
 			
 			WatchMovieRetrievalPlan retrievalPlan = (WatchMovieRetrievalPlan)new Notifier(conf).getRetrievalPlan(videoId, conf.get("test.user.id"));
-			retrievalPlan.getRequests().get(0).setPort(conf.getDaemonPort());
+			
 			log.info("------------------ RP --------------------------");
 			log.info("retrievalPlan.getVideoId(): "+retrievalPlan.getVideoId());
+			log.info("retrievalPlan.getVideoLenght(): "+retrievalPlan.getVideoLenght());
 			log.info("retrievalPlan.getRequests().size(): "+retrievalPlan.getRequests().size());
 			log.info("retrievalPlan.getRequests().get(0).getHost(): "+retrievalPlan.getRequests().get(0).getHost());
 			log.info("retrievalPlan.getRequests().get(0).getPort(): "+retrievalPlan.getRequests().get(0).getPort());
@@ -72,7 +73,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
 			//TODO agregar el tamaño del video al plan
-			response.setContentLength(retrievalPlan.getRequests().get(0).getRequest().getCacho().getLength());
+			response.setContentLength((int)retrievalPlan.getVideoLenght());
 			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
 
 			response.flushBuffer();

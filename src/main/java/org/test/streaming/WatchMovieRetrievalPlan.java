@@ -6,10 +6,12 @@ import java.util.List;
 public class WatchMovieRetrievalPlan implements MovieRetrievalPlan {
 	
 	private final String videoId;
-//	private final Conf conf;
+	private long videoLenght;
+
+	//	private final Conf conf;
 	private final List<CachoRetrieval> requests = new LinkedList<CachoRetrieval>();
 
-	public WatchMovieRetrievalPlan(String videoId/*, Conf conf*/) {
+	public WatchMovieRetrievalPlan(String videoId) {
 		super();
 		this.videoId = videoId;
 //		this.conf = conf;
@@ -23,5 +25,13 @@ public class WatchMovieRetrievalPlan implements MovieRetrievalPlan {
 	@Override
 	public String getVideoId() {
 		return videoId;
+	}
+	
+	public long getVideoLenght() {
+		return videoLenght;
+	}
+
+	public void setVideoLenght(long videoLenght) {
+		this.videoLenght = videoLenght;
 	}
 }

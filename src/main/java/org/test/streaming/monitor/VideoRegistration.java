@@ -41,7 +41,7 @@ public class VideoRegistration implements Registration{
 		MovieCachoFile movieCachoFile = new MovieCachoFile(new MovieCacho(0, (int)video.length()), video); 
 		Map<Integer, String> hashes = new MovieCachoHasher().hashMovieCachoFile(movieCachoFile, indexableSize);
 		
-		String chunks = new ChunkEncoder().encodeCacho(hashes);
+		String chunks = new ChunkEncoder().encodeVideoChunks(hashes);
 		
 		String registrationResponse  = notifier.registerVideo(videoId, videoFileName, videoFileSize, chunks);
 		log.info("Hashed full video: "+videoId+" - "+videoFileName+" - "+ videoFileSize +" - "+ chunks);
