@@ -121,7 +121,7 @@ public class Conf {
 	}
 
 	public boolean isSharingEnabled() {
-		return Boolean.getBoolean(get(sharingEnabled));
+		return Boolean.parseBoolean(get(sharingEnabled));
 	}
 
 }

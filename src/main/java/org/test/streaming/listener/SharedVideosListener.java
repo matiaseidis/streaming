@@ -18,12 +18,14 @@ public class SharedVideosListener implements ServletContextListener {
 		Conf conf = new Conf();
 		
 		if(!conf.isSharingEnabled()){
+			log.info("SHARING DISABLED");
 			return;
 		}
 		
 		SharedVideosMonitor sharedVideoMonitor = new SharedVideosMonitor(conf);
 		
 		try {
+			log.info("SHARING ENABLED");
 			sharedVideoMonitor.begin();
 		} catch (Exception e) {
 			log.fatal("Unable to start minitor for shared videos", e);
