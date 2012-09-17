@@ -1,5 +1,6 @@
 package org.test.streaming.monitor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,6 +9,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.test.streaming.CachoRequest;
 import org.test.streaming.CachoRetrieval;
 import org.test.streaming.Conf;
@@ -42,53 +47,66 @@ public class Notifier {
 	}
 
 	public MovieRetrievalPlan getRetrievalPlan(String videoId, String userId){
+		
+		log.info("requesting retrieval plan for video "+videoId+" for user: "+userId);
 
 		String url = conf.getNotifierUrl()+"planservice/getRetrievalPlan?videoId="+videoId+"&userId="+userId;
 		String rp = new IndexRequester(url).get();
 		
-		log.info("retrieval plan response at <"+url+">: "+rp);
-		
-		LinkedHashMap json = new Gson().fromJson(rp, LinkedHashMap.class);
-		
-		log.info("JSON: "+json.toString());
-
-		String fileName = ((StringMap)((StringMap)json.get("body")).get("video")).get("fileName").toString();
-		String videoLenght = ((StringMap)((StringMap)json.get("body")).get("video")).get("lenght").toString();
-		
-		/*
-		 * viene otro videoId del indice
-		 */
-		log.info("-------------");
-		log.info(((StringMap)json.get("body")).toString());
-		log.info("-------------");
-		String id = ((StringMap)((StringMap)json.get("body")).get("video")).get("videoId").toString();
-		log.info(id);
-		if (!videoId.equals(id)) {
-			throw new RuntimeException("no  puede pasar esto");
+		if(rp == null){
+			return null;
 		}
-
+		
+//		log.info("retrieval plan response at <"+url+">: "+rp);
+		
+		ObjectMapper mapper = new ObjectMapper(); 
 		WatchMovieRetrievalPlan retrievalPlan = new WatchMovieRetrievalPlan(videoId	);
-		retrievalPlan.setVideoLenght(Double.valueOf(videoLenght).longValue());
-		ArrayList<StringMap> userCachos = ((ArrayList<StringMap>)((StringMap)json.get("body")).get("userCachos"));
+		try {
+			
+			LinkedHashMap<String,Object> result = mapper.readValue(rp, new TypeReference<LinkedHashMap<String,Object>>() { });
+			String code = result.get("code").toString();
+			if("ERROR".equalsIgnoreCase(code)){
+				//TODO handle not enough sources o algo asi
+				return new WatchMovieRetrievalPlan(videoId);
+			}
+			
+			LinkedHashMap<String,Object> body  = ((LinkedHashMap<String,Object>)result.get("body"));
+			LinkedHashMap<String,Object> video  = ((LinkedHashMap<String,Object>)body.get("video"));
+			
+			String fileName = video.get("fileName").toString();
+			String videoLenght = video.get("lenght").toString();;
+			String vId = video.get("videoId").toString();;
+			if (!videoId.equals(vId)) {
+				throw new RuntimeException("no  puede pasar esto");
+			}
 
-		for (StringMap userCacho : userCachos) {
-			StringMap userCachoUser = (StringMap)userCacho.get("user");
-			StringMap userCachoMap = (StringMap)userCacho.get("cacho");
-			String from = userCachoMap.get("from").toString();
-			String lenght = userCachoMap.get("lenght").toString();
+			retrievalPlan.setVideoLenght(Double.valueOf(videoLenght).longValue());
 			
-			CachoRequest cachoRequest = new CachoRequest();
-			cachoRequest.setCacho(new MovieCacho(Integer.valueOf(from.split("\\.")[0]), Integer.valueOf(lenght.split("\\.")[0])));
-			cachoRequest.setFileName(fileName);
-			cachoRequest.setMovieId(videoId);
-
-			
-			CachoRetrieval cachoRetrieval = new CachoRetrieval();
-			cachoRetrieval.setHost(userCachoUser.get("ip").toString());
-			cachoRetrieval.setPort(Integer.valueOf(userCachoUser.get("dimonPort").toString().split("\\.")[0].toString()));
-			cachoRetrieval.setRequest(cachoRequest);
-			
-			retrievalPlan.getRequests().add(cachoRetrieval);
+			ArrayList<LinkedHashMap<String,Object>> userCachos  = (ArrayList<LinkedHashMap<String,Object>>)video.get("userCachos");
+			for(LinkedHashMap<String,Object> userCacho : userCachos){
+				System.out.println(userCacho);
+				LinkedHashMap<String,Object> userCachoUser = (LinkedHashMap<String,Object>)userCacho.get("user");
+				ArrayList<LinkedHashMap<String,Object>> userCachoMap = (ArrayList<LinkedHashMap<String,Object>>)userCacho.get("cachos");
+				for(LinkedHashMap<String,Object> cacho: userCachoMap){
+					
+					String from = cacho.get("start").toString();
+					String lenght = cacho.get("lenght").toString();
+					
+					CachoRequest cachoRequest = new CachoRequest();
+					cachoRequest.setCacho(new MovieCacho(Integer.valueOf(from.split("\\.")[0]), Integer.valueOf(lenght.split("\\.")[0])));
+					cachoRequest.setFileName(fileName);
+					cachoRequest.setMovieId(videoId);
+					
+					CachoRetrieval cachoRetrieval = new CachoRetrieval();
+					cachoRetrieval.setHost(userCachoUser.get("ip").toString());
+					cachoRetrieval.setPort(Integer.valueOf(userCachoUser.get("dimonPort").toString().split("\\.")[0].toString()));
+					cachoRetrieval.setRequest(cachoRequest);
+					
+					retrievalPlan.getRequests().add(cachoRetrieval);
+				}
+			}
+		} catch (Exception e) {
+			log.error("ERROR", e);
 		}
 		return retrievalPlan;
 		

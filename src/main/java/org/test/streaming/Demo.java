@@ -51,6 +51,16 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			
 			WatchMovieRetrievalPlan retrievalPlan = (WatchMovieRetrievalPlan)new Notifier(conf).getRetrievalPlan(videoId, conf.get("test.user.id"));
 			
+			if(retrievalPlan == null){
+				log.error("Error de comunicacion con el indice");
+				return;
+			}
+			if(retrievalPlan.getRequests().isEmpty()){
+				log.error("Sin suficientes fuentes para crear plan");
+				return;
+			}
+			
+			
 			log.info("------------------ RP --------------------------");
 			log.info("retrievalPlan.getVideoId(): "+retrievalPlan.getVideoId());
 			log.info("retrievalPlan.getVideoLenght(): "+retrievalPlan.getVideoLenght());

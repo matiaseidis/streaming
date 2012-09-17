@@ -87,7 +87,6 @@ public class IndexRequester {
 	}
 	
 	private String getResponse(URLConnection conn) throws IOException {
-	
 		String line= null;
 		StringBuilder sb = new StringBuilder();
 		// Get the response
