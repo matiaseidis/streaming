@@ -3,7 +3,6 @@ package org.test.streaming.encoding;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +38,7 @@ public class H264Encoder implements Encoder {
 		this.originDir = originDir;
 		this.targetDir = targetDir;
 		this.tempDir = new File(originDir + "/_TEMP_ENCODING_" + fileName);
-		this.buffer = new File(tempDir + "_SAFE_TO_DELETE_ANYTIME.garbage");
+		this.buffer = new File(tempDir, "_SAFE_TO_DELETE_ANYTIME.garbage");
 
 		File origin = new File(originDir, fileName);
 		if (!origin.exists()) {
@@ -69,7 +68,7 @@ public class H264Encoder implements Encoder {
 		String firstPass = firstStep(inFile);
 		String secondPass = secondStep(inFile, tempFile);
 		String thirdPass = thirdStep(tempFile, outFile);
-		
+				
 		File encodedFile = new File(outFile);
 		try {
 			tempDir.mkdirs();
@@ -79,14 +78,8 @@ public class H264Encoder implements Encoder {
 			launchEncoding(secondPass);
 			launchEncoding(thirdPass);
 
-			if (!new File(tempFile).renameTo(encodedFile)) {
-				String message = "unable to move encoded file " + tempFile
-						+ " to target file " + outFile;
-				log.error(message);
-				throw new IllegalStateException(message);
-			}
-
 			this.removeDirectory(tempDir);
+
 		} catch (IOException e) {
 			log.error("Unable to encode video: " + inFile, e);
 		}
@@ -169,7 +162,7 @@ public class H264Encoder implements Encoder {
 			log.error("encoding process interrupted", e);
 			throw new IOException("process interrupted");
 		}
-		log.debug("exit code: " + process.exitValue());
+		log.info("exit code: " + process.exitValue());
 	}
 
 	private boolean removeDirectory(File directory) {
@@ -200,20 +193,5 @@ public class H264Encoder implements Encoder {
 		}
 		return directory.delete();
 	}
-
-	// public static void main(String[] args) {
-	//
-	// List<String> pelis = Lists.<String>newArrayList(
-	// "BEBES_BAILANDO.mp4.b",
-	// "Cutest_Cat_Ever_.mp4.b",
-	// "Cutest_Cat_Ever_Part_2.mp4.b"
-	// );
-	// String origin = "/home/matias/Escritorio/Luther_Season_2_Complete_720p/";
-	// String target = origin + "TARGET"+ File.separatorChar;
-	// for(String peli : pelis){
-	// H264Encoder encoder = new H264Encoder(peli, origin, target);
-	// encoder.encode();
-	// }
-	// }
 
 }

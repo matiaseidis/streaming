@@ -24,6 +24,9 @@ public class Conf {
 	private String daemonHost = "dimon.host";
 	private String daemonPort = "dimon.port";
 	private String sharingEnabled = "file.sharing.enabled";
+	private String encodingEnabled = "file.encoding.enabled";
+	
+	
 
 	private Properties properties;
 
@@ -122,6 +125,10 @@ public class Conf {
 
 	public boolean isSharingEnabled() {
 		return Boolean.parseBoolean(get(sharingEnabled));
+	}
+
+	public boolean isEncodingEnabled() {
+		return Boolean.parseBoolean(get(encodingEnabled));
 	}
 
 }

@@ -21,7 +21,7 @@ var p=flowplayer('player', 'flowplayer/flowplayer-3.2.10.swf', {
 	log: { level: 'debug', filter: 'org.flowplayer.captions.*' },
 clip: {
 // url: 'test/luther-3.flv',
-    autoPlay:false,
+    autoPlay:true,
     autoBuffering:true,
     scaling:'fit',
     url: 'stream/sandonga.mp4',

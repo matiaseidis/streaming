@@ -29,7 +29,14 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		
 		if (videoId == null) {
 			videoId = conf.get("test.video.file.name");
-		}
+			
+			try {
+				downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
+			} catch (Exception e) {
+				log.error(e);
+			}
+			return;
+		} 
 		
 		log.info("Empezando en el servle para video id: " + videoId);
 		
@@ -37,9 +44,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 		try {
 			downloadFilePosta(response, videoId, conf);
-//			downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 

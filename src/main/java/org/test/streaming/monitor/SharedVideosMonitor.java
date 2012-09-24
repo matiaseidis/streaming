@@ -95,9 +95,19 @@ public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 					}
 					file = dest;
 				}
-				H264Encoder encoder = new H264Encoder(file.getName(), conf
-						.getSharedDir(), conf.getCachosDir());
-				File readyToShareVideo = encoder.encode();
+				
+				File readyToShareVideo = null;
+				
+				if(conf.isEncodingEnabled()){
+					log.info("ENCODING ENABLED");
+					H264Encoder encoder = new H264Encoder(file.getName(), conf
+							.getSharedDir(), conf.getCachosDir());
+					readyToShareVideo = encoder.encode();
+					
+				} else {
+					log.info("ENCODING DISABLED");
+					readyToShareVideo = file;
+				}
 
 				return new VideoRegistration(readyToShareVideo, conf).register();
 			}
