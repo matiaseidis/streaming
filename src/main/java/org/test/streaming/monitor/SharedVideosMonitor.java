@@ -97,6 +97,7 @@ public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 				}
 				
 				File readyToShareVideo = null;
+
 				
 				if(conf.isEncodingEnabled()){
 					log.info("ENCODING ENABLED");
@@ -109,6 +110,7 @@ public class SharedVideosMonitor extends FileAlterationListenerAdaptor {
 					readyToShareVideo = file;
 				}
 
+				
 				return new VideoRegistration(readyToShareVideo, conf).register();
 			}
 		});

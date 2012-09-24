@@ -53,7 +53,7 @@ public class H264Encoder implements Encoder {
 
 
 
-@Override
+	@Override
 	public File encode() {
 
 		String inFile = new File(originDir, fileName).getAbsolutePath();
@@ -62,7 +62,7 @@ public class H264Encoder implements Encoder {
 		String tempFile = new File(tempDir, fileName.replace(extension, tempExtension)
 				+ "." + targetExtension).getAbsolutePath();
 		String outFile = new File(targetDir, fileName.replace(extension, targetExtension)).getAbsolutePath(); 
-		
+
 		scanFile(inFile);
 
 		log.info("About to start encoding for inFile: " + inFile+" - buffer: " + buffer+" - outFile: " + outFile+" - videoBitRate: " + videoBitRate+" - videoHeight: " + videoHeight+" - audioCodec: " + audioCodec+" - audioBitRate: " + audioBitRate);
@@ -70,17 +70,16 @@ public class H264Encoder implements Encoder {
 		String firstPass = firstStep(inFile);
 		String secondPass = secondStep(inFile, tempFile);
 		String thirdPass = thirdStep(tempFile, outFile);
-				
+
 		File encodedFile = new File(outFile);
 		try {
+			
 			tempDir.mkdirs();
 			launchEncoding(firstPass);
 			log.debug("About to delete buffer: " + buffer);
 			buffer.delete();
 			launchEncoding(secondPass);
 			launchEncoding(thirdPass);
-
-
 
 			this.removeDirectory(tempDir);
 

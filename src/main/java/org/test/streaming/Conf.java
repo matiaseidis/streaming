@@ -23,8 +23,8 @@ public class Conf {
 	private String monitorInterval = "monitor.interval";
 	private String daemonHost = "dimon.host";
 	private String daemonPort = "dimon.port";
-	private String sharingEnabled = "file.sharing.enabled";
 	private String encodingEnabled = "file.encoding.enabled";
+	private String sharingEnabled = "file.sharing.enabled";
 	
 	
 
@@ -123,12 +123,12 @@ public class Conf {
 		return new File(System.getProperty("user.home"));
 	}
 
-	public boolean isSharingEnabled() {
-		return Boolean.parseBoolean(get(sharingEnabled));
-	}
-
 	public boolean isEncodingEnabled() {
 		return Boolean.parseBoolean(get(encodingEnabled));
 	}
-
+	
+	public boolean isSharingEnabled() {
+		return Boolean.parseBoolean(get(sharingEnabled));
+	}
+	
 }
