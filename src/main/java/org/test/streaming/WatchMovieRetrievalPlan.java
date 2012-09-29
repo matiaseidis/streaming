@@ -8,13 +8,11 @@ public class WatchMovieRetrievalPlan implements MovieRetrievalPlan {
 	private final String videoId;
 	private long videoLenght;
 
-	//	private final Conf conf;
 	private final List<CachoRetrieval> requests = new LinkedList<CachoRetrieval>();
 
 	public WatchMovieRetrievalPlan(String videoId) {
 		super();
 		this.videoId = videoId;
-//		this.conf = conf;
 	}
 
 	@Override

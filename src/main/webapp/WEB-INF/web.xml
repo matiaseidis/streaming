@@ -14,13 +14,23 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>s</servlet-name>
+		<servlet-name>play</servlet-name>
 		<servlet-class>org.test.streaming.Demo</servlet-class>
 	</servlet>
 
+	<servlet>
+		<servlet-name>push</servlet-name>
+		<servlet-class>org.test.streaming.ManualPush</servlet-class>
+	</servlet>
+
 	<servlet-mapping>
-		<servlet-name>s</servlet-name>
+		<servlet-name>play</servlet-name>
 		<url-pattern>/stream/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>push</servlet-name>
+		<url-pattern>/push/*</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>
