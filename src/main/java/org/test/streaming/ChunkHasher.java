@@ -69,7 +69,7 @@ public class ChunkHasher {
 		} else {
 			endByte = nextChunkFirstByteIndex + chunkSize > file.length() ? file.length() : nextChunkFirstByteIndex + chunkSize - 1;
 		}
-		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex +" to " + endByte);
+//		log.info("hashed chunk: " +file.getName()+" - "+hashtext+" - from "+nextChunkFirstByteIndex +" to " + endByte);
 		return hashtext;
 	}
 

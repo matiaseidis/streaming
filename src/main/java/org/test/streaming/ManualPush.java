@@ -34,7 +34,7 @@ public class ManualPush extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		System.out.println("Paso por manual");
+		
 		
 		List<CachoRetrieval> requests = new ArrayList<CachoRetrieval>();
 		String videoId = req.getParameter("videoId");

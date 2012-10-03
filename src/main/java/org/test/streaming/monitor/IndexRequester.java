@@ -55,13 +55,11 @@ public class IndexRequester {
 		    // Construct data
 			String data = "";
 			for(Map.Entry<String,String> param: params.entrySet()){
-//				data += "&" + URLEncoder.encode(param.getKey(), "UTF-8") + "=" + URLEncoder.encode(param.getValue(), "UTF-8");
 				data += "&" + param.getKey() + "=" + param.getValue();
 				
 			}
 			data = data.substring(1);
-		    System.out.println(data);
-
+		    
 		    // Send data
 		    URL url = new URL(urlString);
 		    URLConnection conn = url.openConnection();

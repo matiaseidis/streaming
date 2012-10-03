@@ -84,7 +84,7 @@ public class Notifier {
 			
 			ArrayList<LinkedHashMap<String,Object>> userCachos  = (ArrayList<LinkedHashMap<String,Object>>)video.get("userCachos");
 			for(LinkedHashMap<String,Object> userCacho : userCachos){
-				System.out.println(userCacho);
+				
 				LinkedHashMap<String,Object> userCachoUser = (LinkedHashMap<String,Object>)userCacho.get("user");
 				ArrayList<LinkedHashMap<String,Object>> userCachoMap = (ArrayList<LinkedHashMap<String,Object>>)userCacho.get("cachos");
 				for(LinkedHashMap<String,Object> cacho: userCachoMap){

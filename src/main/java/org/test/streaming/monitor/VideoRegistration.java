@@ -44,7 +44,7 @@ public class VideoRegistration implements Registration{
 		String chunks = new ChunkEncoder().encodeVideoChunks(hashes);
 		
 		String registrationResponse  = notifier.registerVideo(videoId, videoFileName, videoFileSize, chunks);
-		log.info("Hashed full video: "+videoId+" - "+videoFileName+" - "+ videoFileSize +" - "+ chunks);
+		log.info("Hashed full video: "+videoId+" - "+videoFileName+" - "+ videoFileSize +" - "+ chunks.split("-").length +" chunks");
 		
 		LinkedHashMap json = new Gson().fromJson(registrationResponse, LinkedHashMap.class);
 		
