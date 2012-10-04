@@ -19,7 +19,7 @@ public class DimonStarterListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		Dimon dimon = (Dimon)sce.getServletContext().getAttribute("dimon");
+		Dimon dimon = (Dimon) sce.getServletContext().getAttribute("dimon");
 		dimon.stop();
 		
 	}

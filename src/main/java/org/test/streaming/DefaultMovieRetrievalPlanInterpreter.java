@@ -33,7 +33,7 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 
 			@Override
 			public void onCachoComplete(CachoStreamer streamer) {
-				if(streamers.size()>0){
+				if (streamers.size() > 0) {
 					streamers.get(0).stream();
 				}
 			}
