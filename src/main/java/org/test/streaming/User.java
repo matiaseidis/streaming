@@ -4,13 +4,15 @@ public class User {
 	
 	private final String id;
 	private String ip;
-	private String port;
+	private String servlePort;
+	private String dimonPort;
 	private String email;
 
-	public User(String id, String email, String ip, String port) {
+	public User(String id, String email, String ip, String servlePort, String dimonPort) {
 		this.id = id;
 		this.ip = ip;
-		this.port = port;
+		this.servlePort = servlePort;
+		this.dimonPort = dimonPort;
 		this.email = email;
 	}
 	
@@ -26,20 +28,28 @@ public class User {
 		this.ip = ip;
 	}
 
-	public String getPort() {
-		return port;
-	}
-
-	public void setPort(String port) {
-		this.port = port;
-	}
-
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getServlePort() {
+		return servlePort;
+	}
+
+	public void setServlePort(String servlePort) {
+		this.servlePort = servlePort;
+	}
+
+	public String getDimonPort() {
+		return dimonPort;
+	}
+
+	public void setDimonPort(String dimonPort) {
+		this.dimonPort = dimonPort;
 	}
 
 }
