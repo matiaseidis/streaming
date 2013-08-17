@@ -1,6 +1,5 @@
 package org.test.streaming.monitor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,8 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.test.streaming.CachoRequest;
@@ -22,7 +19,6 @@ import org.test.streaming.User;
 import org.test.streaming.WatchMovieRetrievalPlan;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.StringMap;
 
 public class Notifier {
 	
@@ -119,11 +115,6 @@ public class Notifier {
 
 	public String registerVideo(String videoId, String fileName, long lenght, String chunks) {
 
-		//register/{videoId}/{fileName}/{lenght}/{chunks}/{userId}", method = RequestMethod.POST)
-		
-//		 registerVideo(@NotNull String videoId, @NotNull  String fileName, @NotNull Long lenght, @NotNull String userId, @NotNull String chunks){
-				
-//		String url = conf.getNotifierUrl()+"VideoService/registerVideo/"+videoId+"/"+fileName+"/"+lenght+"/"+conf.get("test.user.id")+"/"+chunks;
 		String url = conf.getNotifierUrl()+"videoService/registerVideo";
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("videoId", videoId);
@@ -133,14 +124,19 @@ public class Notifier {
 		params.put("userId", conf.get("test.user.id"));
 		
 		return new IndexRequester(url).post(params);
-//		return new IndexRequester(url).get();
 	}
 	
 	public String registerUser(User user) {
-		//add/{nombre}/{email}/{ip}/{port}
-		String url = conf.getNotifierUrl()+"UserService/add/"+user.getId()+"/"+user.getEmail()+"/"+user.getIp()+"/"+user.getPort();
-		return new IndexRequester(url).post(null);	
 		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("name", user.getId());
+		params.put("email", user.getEmail());
+		params.put("ip", user.getIp());
+		params.put("servlePort", user.getServlePort());
+		params.put("dimonPort", user.getDimonPort());
+		
+		String url = conf.getNotifierUrl()+"UserService/create";
+		return new IndexRequester(url).post(params);	
 	}
 
 }

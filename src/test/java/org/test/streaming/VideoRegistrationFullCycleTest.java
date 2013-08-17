@@ -41,7 +41,7 @@ public class VideoRegistrationFullCycleTest {
 		 */
 		Assert.assertTrue(StringUtils.isNotEmpty(conf.get("test.user.id")));
 
-		User user = new User(conf.get("test.user.id"), "user@test.com", "localhost", "8080");
+		User user = new User(conf.get("test.user.id"), "user@test.com", "localhost", "8080", "10002");
 		UserRegistration userRegistration = new UserRegistration(user, conf);
 		userRegistration.go();
 		
@@ -66,7 +66,7 @@ public class VideoRegistrationFullCycleTest {
 		 * el usuario registra un cacho del mismo video
 		 * pido el retrieval plan  
 		 */
-		User otroUser = new User("otro-user-test", "otro-user@test.com", "1.1.1.1", "8080");
+		User otroUser = new User("otro-user-test", "otro-user@test.com", "1.1.1.1", "8080", "10002");
 		UserRegistration otherUserRegistration = new UserRegistration(otroUser, conf);
 		otherUserRegistration.go();
 		int chunkLenght = 1024*1024;

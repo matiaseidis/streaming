@@ -22,6 +22,11 @@
 		<servlet-name>push</servlet-name>
 		<servlet-class>org.test.streaming.ManualPush</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>user</servlet-name>
+		<servlet-class>org.test.streaming.UserCreator</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>play</servlet-name>
@@ -31,6 +36,11 @@
 	<servlet-mapping>
 		<servlet-name>push</servlet-name>
 		<url-pattern>/push/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>user</servlet-name>
+		<url-pattern>/user/*</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>
