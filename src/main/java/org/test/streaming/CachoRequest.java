@@ -6,9 +6,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class CachoRequest implements Serializable, Comparable<CachoRequest> {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String movieId;
 	private String fileName;

@@ -7,6 +7,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class MovieCacho implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+
 	private int firstByteIndex;
 	private int length;
 
