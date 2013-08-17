@@ -33,7 +33,7 @@ public class CachoRequesterTest {
 		baos.close();
 		File streamedData = new File(streamOutFileName);
 		Assert.assertTrue(streamedData.exists());
-		Assert.assertEquals(streamedData.length(), Integer.parseInt(conf.get("test.video.file.size")));
+		Assert.assertEquals(Integer.parseInt(conf.get("test.video.file.size")), streamedData.length());
 	}
 
 	/**
