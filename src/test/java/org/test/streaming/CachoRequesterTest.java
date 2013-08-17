@@ -26,11 +26,12 @@ public class CachoRequesterTest {
 	@Test
 	public void testStream() throws Exception {
 		Conf conf = new Conf("/alt-test-conf.properties");
-		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File("sandonga1.mp4")));
+		String streamOutFileName = "sandonga2.mp4";
+		BufferedOutputStream baos = new BufferedOutputStream(new FileOutputStream(new File(streamOutFileName)));
 		new DefaultMovieRetrievalPlanInterpreter(conf.getCachosDir(), conf.getTempDir()).interpret(new DummyMovieRetrievalPlan(conf.get("test.video.file.name"), conf), baos, new ProgressLogger());
 		baos.flush();
 		baos.close();
-		File streamedData = new File("sandonga1.mp4");
+		File streamedData = new File(streamOutFileName);
 		Assert.assertTrue(streamedData.exists());
 		Assert.assertEquals(streamedData.length(), Integer.parseInt(conf.get("test.video.file.size")));
 	}
