@@ -20,7 +20,7 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 
 		int totalSize = Integer.parseInt(conf.get("test.video.file.size"));
 		int totalRequested = 0;
-		int requestSize = 1024 * 1024 * 64;
+		int requestSize = 1024 * 1024 * 256;
 		int amountOfRequests = 0;
 
 		String movieFileName = conf.get("test.video.file.name");

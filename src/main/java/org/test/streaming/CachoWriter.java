@@ -22,7 +22,7 @@ public class CachoWriter implements ChannelFutureListener {
 	public void uploadCacho(Channel output, InputStream input, int lenght) throws IOException {
 		this.total = lenght;
 		int t = 0;
-		int b = 1024 * 1;
+		int b = 1024 * 1024 * 4;
 		try {
 			log.debug("Uploading cacho...");
 			int s = lenght / b;
