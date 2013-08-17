@@ -52,7 +52,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 	private void downloadFilePosta(HttpServletResponse response, String videoId, Conf conf) {
 		try {
-
+			System.out.println("Demo.downloadFilePosta()");
 			WatchMovieRetrievalPlan retrievalPlan = (WatchMovieRetrievalPlan) new Notifier(conf).getRetrievalPlan(videoId, conf.get("test.user.id"));
 
 			if (retrievalPlan == null) {

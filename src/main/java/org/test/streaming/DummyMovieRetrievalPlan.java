@@ -30,8 +30,6 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 			amountOfRequests++;
 		}
 		requests.add(new CachoRetrieval(conf.getDaemonHost(), conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, totalSize - totalRequested)));
-		requests = new LinkedList<CachoRetrieval>();
-		requests.add(new CachoRetrieval(conf.getDaemonHost(), conf.getDaemonPort(), new CachoRequest(null, movieFileName, 0, totalRequested		)));
 		return requests;
 	}
 

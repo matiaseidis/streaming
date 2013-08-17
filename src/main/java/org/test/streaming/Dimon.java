@@ -39,7 +39,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 
 		// Bind and start to accept incoming connections.
 		bootstrap.bind(new InetSocketAddress(port));
-		log.info("Dimon is ready, awaiting for Cacho requests...");
+		log.info("Dimon is ready, awaiting for Cacho requests on port " + this.port + "...");
 		log.info(this.conf.getCachosDir());
 	}
 
