@@ -75,7 +75,7 @@ public class ManualPush extends HttpServlet {
 			return null;
 		}
 		if(StringUtils.isEmpty(ip)){
-			log.error("port no puede estar vacio");
+			log.error("ip no puede estar vacio");
 			return null;
 		}
 		if(StringUtils.isEmpty(port)){
