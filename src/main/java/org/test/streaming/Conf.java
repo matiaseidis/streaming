@@ -25,8 +25,6 @@ public class Conf {
 	private String daemonPort = "dimon.port";
 	private String encodingEnabled = "file.encoding.enabled";
 	private String sharingEnabled = "file.sharing.enabled";
-	
-	
 
 	private Properties properties;
 
@@ -46,8 +44,7 @@ public class Conf {
 			props.load(is);
 		} catch (IOException e) {
 			e.printStackTrace();
-			log.fatal("Unable to load configuration values form " + confPath
-					+ " - context shutdown.");
+			log.fatal("Unable to load configuration values form " + confPath + " - context shutdown.");
 			System.exit(1);
 		}
 		this.properties = props;
@@ -60,8 +57,7 @@ public class Conf {
 	private void createDirOrShutDown(File dir) {
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
-				log.fatal("Unable to create directory " + dir.getAbsolutePath()
-						+ " - context shutdown.");
+				log.fatal("Unable to create directory " + dir.getAbsolutePath() + " - context shutdown.");
 				System.exit(1);
 			}
 		}
@@ -90,7 +86,7 @@ public class Conf {
 	public String get(String propertyKey) {
 		String result = properties.getProperty(propertyKey);
 		if (result == null) {
-			throw new PropertyNotFoundException(propertyKey);
+			throw new IllegalArgumentException("property not found: " + propertyKey);
 		}
 		return result;
 	}
@@ -126,9 +122,9 @@ public class Conf {
 	public boolean isEncodingEnabled() {
 		return Boolean.parseBoolean(get(encodingEnabled));
 	}
-	
+
 	public boolean isSharingEnabled() {
 		return Boolean.parseBoolean(get(sharingEnabled));
 	}
-	
+
 }
