@@ -2,6 +2,10 @@ package org.test.streaming;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +23,9 @@ public class CachoWriter implements ChannelFutureListener {
 	int total;
 	int written;
 
+	public CachoWriter() {
+	}
+
 	public void uploadCacho(Channel output, InputStream input, int lenght) throws IOException {
 		this.total = lenght;
 		int t = 0;
@@ -32,7 +39,9 @@ public class CachoWriter implements ChannelFutureListener {
 				outBuffer.writeBytes(input, outBuffer.writableBytes());
 				readableBytes = outBuffer.readableBytes();
 				t += readableBytes;
-				output.write(outBuffer).addListener(this);
+				ChannelFuture write = output.write(outBuffer);
+				write.addListener(this);
+				write.removeListener(this);
 			}
 
 			if (r != 0) {
@@ -40,8 +49,13 @@ public class CachoWriter implements ChannelFutureListener {
 				outBuffer.writeBytes(input, outBuffer.writableBytes());
 				readableBytes = outBuffer.readableBytes();
 				t += readableBytes;
-				output.write(outBuffer);
+				ChannelFuture write = output.write(outBuffer);
+				write.addListener(this);
+				write.removeListener(this);
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
 			input.close();
 		}
