@@ -21,7 +21,7 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 
 		int totalSize = Integer.parseInt(conf.get("test.video.file.size"));
 		int totalRequested = 0;
-		int requestSize = 1024 * 1024 * 64;
+		int requestSize = 1024 * 1024 * 1;
 		int amountOfRequests = 0;
 
 		String movieFileName = conf.get("test.video.file.name");
@@ -32,8 +32,10 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 			} else {
 				daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
 			}
+			daemonHost = "localhost";
 			requests.add(new CachoRetrieval(daemonHost, conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;
+			requestSize = requestSize * 2;
 			amountOfRequests++;
 		}
 		if (amountOfRequests % 2 == 0) {
@@ -42,6 +44,7 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 			daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
 		}
 
+		daemonHost = "localhost";
 		requests.add(new CachoRetrieval(daemonHost, conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, totalSize - totalRequested)));
 		return requests;
 	}

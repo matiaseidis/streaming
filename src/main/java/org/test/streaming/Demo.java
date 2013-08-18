@@ -30,7 +30,8 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 		if (videoId == null) {
 			videoId = conf.get("test.video.file.name");
 			try {
-				downloadFile(response, videoId, Integer.parseInt(conf.get("test.video.file.size")), conf);
+				int fileSize = Integer.parseInt(conf.get("test.video.file.size"));
+				downloadFile(response, videoId, fileSize, conf);
 			} catch (Exception e) {
 				log.error(e);
 			}
@@ -87,7 +88,6 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 			// TODO agregar el tamaño del video al plan
 			response.setContentLength((int) retrievalPlan.getVideoLenght());
 			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
-
 			response.flushBuffer();
 
 			OutputStream os = response.getOutputStream();
@@ -107,7 +107,6 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	}
 
 	public void downloadFile(HttpServletResponse response, String videoId, int videoSize, Conf conf) throws Exception {
-
 		try {
 			response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
