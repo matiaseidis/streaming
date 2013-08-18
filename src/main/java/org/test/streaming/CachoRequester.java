@@ -18,20 +18,16 @@ import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 public class CachoRequester implements ProgressObserver {
 
-	private String host;
-	private int port;
 	private Map<CachoRequest, ProgressReport> progress = Collections.synchronizedMap(new TreeMap<CachoRequest, ProgressReport>());
 	/**
 	 * Maybe null
 	 */
 	private StreamingProgressObserver progressObserver;
 
-	public CachoRequester(String host, int port) {
-		this.setHost(host);
-		this.setPort(port);
+	public CachoRequester() {
 	}
 
-	public void requestCacho(String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes, final OutputStream out) {
+	public void requestCacho(String host, int port, String movieFileName, int zeroBasedFirstBytePosition, int amountOfBytes, final OutputStream out) {
 		CachoRequest cachoRequest = new CachoRequest(null, movieFileName, zeroBasedFirstBytePosition, amountOfBytes);
 
 		// Configure the client.
@@ -49,9 +45,9 @@ public class CachoRequester implements ProgressObserver {
 			}
 		});
 
-		System.out.println(this.getHost());
+		System.out.println(host);
 		// Start the connection attempt.
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(this.getHost(), this.getPort()));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
 		bootstrap.setOption("tcpNoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		// Wait until the connection is closed or the connection attempt fails.
@@ -66,22 +62,6 @@ public class CachoRequester implements ProgressObserver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
 	}
 
 	@Override
