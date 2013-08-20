@@ -38,6 +38,7 @@ public class BackgroundCachoStreamer extends CachoStreamer {
 		try {
 			this.setCurrentOut(new BufferedOutputStream(new FileOutputStream(this.getCachoFile())));
 		} catch (FileNotFoundException e) {
+			
 			log.fatal("Faile to create new local cacho file " + this.getCachoFile(), e);
 		}
 		log.debug("[" + firstByte + ", " + (cachoLength - 1) + "] (" + cachoLength + ") - Downloading... ");

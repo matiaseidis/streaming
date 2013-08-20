@@ -26,7 +26,6 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		Conf conf = new Conf();
 		String videoId = request.getParameter(videoParam);
-
 		if (videoId == null) {
 			videoId = conf.get("test.video.file.name");
 			try {
@@ -36,6 +35,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 				log.error(e);
 			}
 			return;
+		} else {
 		}
 
 		log.info("Empezando en el servle para video id: " + videoId);
@@ -117,7 +117,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 			OutputStream os = response.getOutputStream();
 
-			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os, new ProgressLogger());
+			new DefaultMovieRetrievalPlanInterpreter(new File("/home/us/sharedCachos"), new File("/home/us/tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os, new ProgressLogger());
 
 			os.flush();
 			os.close();

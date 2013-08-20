@@ -30,6 +30,7 @@ public class CachoMovieFileLocator extends LibraryBasedMovieFileLocator {
 			String eachMovieFileName = allMovieFileNames[i];
 			if (eachMovieFileName.startsWith(request.getFileName())) {
 				try {
+					log.debug("Searching for cacho file: " + eachMovieFileName);
 					MoviePartMetadata moviePartMetadata = new MoviePartMetadata(new File(this.getLibraryPath(), eachMovieFileName));
 					MovieCacho candidate = moviePartMetadata.getCacho().getCacho();
 					if (candidate.overlaps(request.getCacho()) != null) {
