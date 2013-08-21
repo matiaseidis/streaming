@@ -24,7 +24,9 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 		int amountOfRequests = 0;
 
 		String movieFileName = conf.get("test.video.file.name");
-		String daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
+		// String daemonHost =
+		// "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
+		String daemonHost = "localhost";
 		while (totalSize - totalRequested >= requestSize) {
 			requests.add(new CachoRetrieval(daemonHost, conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;
