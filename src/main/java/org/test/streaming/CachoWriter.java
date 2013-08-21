@@ -61,6 +61,7 @@ public class CachoWriter implements ChannelFutureListener {
 	@Override
 	public void operationComplete(ChannelFuture future) throws Exception {
 		written += readableBytes;
-		System.out.println("Written " + written + " " + (total - written) + " to go ( " + written * 100 / (double) total + "%)");
+		double progress = ((double) written / (double) total) * 100d;
+		System.out.println("Written " + written + " " + (total - written) + " to go ( " + progress + "%)");
 	}
 }
