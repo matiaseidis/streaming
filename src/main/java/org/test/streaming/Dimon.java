@@ -17,11 +17,13 @@ import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 public class Dimon extends SimpleChannelUpstreamHandler {
 	protected static final Log log = LogFactory.getLog(Dimon.class);
 
-	private final int port;
+	private int port;
+	private String ip;
 	private Conf conf;
 
-	public Dimon(int port) {
+	public Dimon(String ip, int port) {
 		this.port = port;
+		this.ip = ip;
 		this.conf = new Conf();
 	}
 
@@ -41,7 +43,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 		bootstrap.setOption("child.keepAlive", true);
 
 		// Bind and start to accept incoming connections.
-		bootstrap.bind(new InetSocketAddress("localhost", port));
+		bootstrap.bind(this.ip != null ? new InetSocketAddress(this.ip, port) : new InetSocketAddress(port));
 		log.info("Dimon is ready, awaiting for Cacho requests on port " + this.port + "...");
 		log.info(this.conf.getCachosDir());
 	}
@@ -54,12 +56,16 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 
 	public static void main(String[] args) throws Exception {
 		int port;
+		String ip;
 		if (args.length > 0) {
 			port = Integer.parseInt(args[0]);
+			if (args.length > 1) {
+				ip = args[1];
+			}
 		} else {
 			port = 10002;
 		}
-		new Dimon(port).run();
+		new Dimon(ip, port).run();
 	}
 
 }
