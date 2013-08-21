@@ -1,5 +1,6 @@
 package org.test.streaming;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
@@ -40,7 +41,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 		bootstrap.setOption("child.keepAlive", true);
 
 		// Bind and start to accept incoming connections.
-		bootstrap.bind(new InetSocketAddress(port));
+		bootstrap.bind(new InetSocketAddress("localhost", port));
 		log.info("Dimon is ready, awaiting for Cacho requests on port " + this.port + "...");
 		log.info(this.conf.getCachosDir());
 	}
