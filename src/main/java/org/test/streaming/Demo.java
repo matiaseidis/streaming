@@ -108,7 +108,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 	public void downloadFile(HttpServletResponse response, String videoId, int videoSize, Conf conf) throws Exception {
 		try {
-			response.setBufferSize(bufferSize);
+			// response.setBufferSize(bufferSize);
 			response.setContentType(contentTypeMP4);
 			response.setContentLength(videoSize);
 			response.addHeader("Content-disposition", "attachment;filename=" + videoId);
@@ -117,7 +117,7 @@ public class Demo extends javax.servlet.http.HttpServlet implements javax.servle
 
 			OutputStream os = response.getOutputStream();
 
-			new DefaultMovieRetrievalPlanInterpreter(new File("/home/us/sharedCachos"), new File("/home/us/tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os, new ProgressLogger());
+			new DefaultMovieRetrievalPlanInterpreter(new File("sharedCachos"), new File("tempCachos")).interpret(new DummyMovieRetrievalPlan(videoId, conf), os, new ProgressLogger());
 
 			os.flush();
 			os.close();

@@ -1,6 +1,5 @@
 package org.test.streaming;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,30 +20,18 @@ public class DummyMovieRetrievalPlan implements MovieRetrievalPlan {
 
 		int totalSize = Integer.parseInt(conf.get("test.video.file.size"));
 		int totalRequested = 0;
-		int requestSize = 1024 * 1024 * 1;
+		int requestSize = 1024 * 1024 * 16;
 		int amountOfRequests = 0;
 
 		String movieFileName = conf.get("test.video.file.name");
-		String daemonHost = null;
+		String daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
 		while (totalSize - totalRequested >= requestSize) {
-			if (amountOfRequests % 2 == 0) {
-				daemonHost = "ec2-54-214-146-17.us-west-2.compute.amazonaws.com";
-			} else {
-				daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
-			}
-			daemonHost = "localhost";
 			requests.add(new CachoRetrieval(daemonHost, conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, requestSize)));
 			totalRequested += requestSize;
 			requestSize = requestSize * 2;
 			amountOfRequests++;
 		}
-		if (amountOfRequests % 2 == 0) {
-			daemonHost = "ec2-54-214-146-17.us-west-2.compute.amazonaws.com";
-		} else {
-			daemonHost = "ec2-54-212-135-180.us-west-2.compute.amazonaws.com";
-		}
 
-		daemonHost = "localhost";
 		requests.add(new CachoRetrieval(daemonHost, conf.getDaemonPort(), new CachoRequest(null, movieFileName, totalRequested, totalSize - totalRequested)));
 		return requests;
 	}
