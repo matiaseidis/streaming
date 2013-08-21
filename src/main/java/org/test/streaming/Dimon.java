@@ -21,6 +21,10 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 	private String ip;
 	private Conf conf;
 
+	public Dimon(int port) {
+		this(null, port);
+	}
+
 	public Dimon(String ip, int port) {
 		this.port = port;
 		this.ip = ip;
@@ -56,7 +60,7 @@ public class Dimon extends SimpleChannelUpstreamHandler {
 
 	public static void main(String[] args) throws Exception {
 		int port;
-		String ip;
+		String ip = null;
 		if (args.length > 0) {
 			port = Integer.parseInt(args[0]);
 			if (args.length > 1) {
