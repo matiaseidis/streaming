@@ -48,13 +48,6 @@ public class DefaultMovieRetrievalPlanInterpreter implements MovieRetrievalPlanI
 		tasks.add(runnable);
 		for (final CachoRetrieval a : requests.subList(1, requests.size())) {
 			log.debug("share dir: " + this.getShareDir());
-			log.debug("");
-			log.debug("");
-			log.debug("");
-			log.debug("");
-			log.debug("");
-			
-			
 			
 			final BackgroundCachoStreamer cachoStreamer = new BackgroundCachoStreamer(this.getShareDir(), this.createPartFile(a.getRequest()), out, a.getRequest().getFirstByteIndex(), a.getRequest().getLength(), new OnCachoComplete() {
 
